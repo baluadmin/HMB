@@ -12,23 +12,23 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 11px !important; }
-        .stApp { background-color: #fffafb !important; }
+        .stApp { background-color: #f8fafc !important; }
         .block-container { padding: 0.3rem !important; max-width: 100% !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
         
         .store-header {
             background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            padding: 6px; border-radius: 6px; text-align: center; margin-bottom: 6px; border: 1px solid #fecdd3;
+            padding: 6px 10px; border-radius: 8px; text-align: center; margin-bottom: 6px; border: 1px solid #fecdd3;
         }
         .store-title { font-size: 14px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
         .store-subtitle { font-size: 9px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 1px 0 0 0; }
 
-        /* Compact button sizing to fit side-by-side */
+        /* Quick-commerce style add button */
         div.stButton > button {
-            background: #e11d48 !important;
-            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 3px !important; padding: 3px 2px !important; min-height: unset !important; width: 100% !important;
+            background: #ffffff !important;
+            color: #e11d48 !important; border: 1px solid #e11d48 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
-        div.stButton > button:hover { background: #be123c !important; }
+        div.stButton > button:hover { background: #fff1f2 !important; }
 
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 2rem; width: 100%; }
         .login-card { width: 100%; max-width: 360px; padding: 14px; border-radius: 10px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -86,7 +86,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Tight single-line layout using balanced mobile column widths
+# Single line header for user info and navigation actions
 user_col, b1, b2, b3 = st.columns([1.1, 0.8, 0.9, 0.8], gap="small")
 with user_col: st.markdown(f"👤 <span style='font-size:9px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
 with b1:
@@ -162,30 +162,36 @@ if st.session_state.current_view == "Home":
     filtered_products = [p for p in product_records if p['category'] == current_cat]
     
     if filtered_products:
-        for idx, prod in enumerate(filtered_products):
-            q_key = f"qty_{current_cat}_{idx}"
-            if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
-            
-            with st.container(border=True):
-                info_col, action_col = st.columns([2.2, 1.8], gap="small")
-                with info_col:
-                    st.markdown(f"**{prod['name']}**")
-                    st.markdown(f"<span style='color:#e11d48; font-weight:800; font-size:11px;'>₹{prod['price']}</span> <span style='color:#64748b; font-size:9px;'>({prod['description']})</span>", unsafe_allow_html=True)
-                with action_col:
-                    m_btn, val_col, p_btn = st.columns([1, 1, 1], gap="small")
-                    with m_btn:
-                        if st.button("-", key=f"minus_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
-                            st.session_state.quantities[q_key] -= 1; st.rerun()
-                    with val_col:
-                        st.markdown(f"<div style='text-align:center; font-weight:900; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
-                    with p_btn:
-                        if st.button("+", key=f"plus_{q_key}", use_container_width=True):
-                            st.session_state.quantities[q_key] += 1; st.rerun()
-                
-                if st.button("Add to Cart", key=f"add_cart_{q_key}", use_container_width=True):
-                    st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
-                    st.success("Added to cart!")
-                    st.rerun()
+        # Display products in a 2-column grid layout like quick-commerce apps
+        for i in range(0, len(filtered_products), 2):
+            cols = st.columns(2, gap="small")
+            for j in range(2):
+                if i + j < len(filtered_products):
+                    prod = filtered_products[i + j]
+                    idx = i + j
+                    q_key = f"qty_{current_cat}_{idx}"
+                    if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
+                    
+                    with cols[j]:
+                        with st.container(border=True):
+                            st.markdown(f"<div style='font-weight:800; font-size:12px; height:32px; overflow:hidden;'>{prod['name']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color:#64748b; font-size:10px;'>{prod['description']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color:#e11d48; font-weight:900; font-size:13px; margin:4px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            
+                            q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
+                            with q_m:
+                                if st.button("-", key=f"minus_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
+                                    st.session_state.quantities[q_key] -= 1; st.rerun()
+                            with q_d: 
+                                st.markdown(f"<div style='text-align:center; font-weight:900; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                            with q_p:
+                                if st.button("+", key=f"plus_{q_key}", use_container_width=True):
+                                    st.session_state.quantities[q_key] += 1; st.rerun()
+                            
+                            if st.button("ADD", key=f"add_cart_{q_key}", use_container_width=True):
+                                st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
+                                st.success("Added!")
+                                st.rerun()
     else:
         st.info("No items found under this category in your spreadsheet.")
 else:
