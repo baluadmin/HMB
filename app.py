@@ -79,15 +79,16 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Standard text input search field without automatic suggestion dropdowns
+# Search Bar with automatic clearing/reset behavior
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-if search_query.strip():
-    filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
-else:
+# Automatically displays all items when search box is empty or cleared
+if not search_query or not search_query.strip():
     filtered_products = product_records
+else:
+    filtered_products = [p for p in product_records if search_query.strip().lower() in p['name'].lower() or search_query.strip().lower() in p['category'].lower()]
 
 if filtered_products:
     for i in range(0, len(filtered_products), 2):
