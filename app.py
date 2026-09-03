@@ -79,16 +79,23 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search Bar with automatic clearing/reset behavior
-search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
+# Search Bar with dynamic text handling using session state
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
+
+def update_search():
+    st.session_state.search_query = st.session_state.search_input
+
+search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input", on_change=update_search, label_visibility="collapsed")
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-# Automatically displays all items when search box is empty or cleared
-if not search_query or not search_query.strip():
+# Instantly revert to default full menu when search box is cleared
+active_query = st.session_state.search_query.strip()
+if not active_query:
     filtered_products = product_records
 else:
-    filtered_products = [p for p in product_records if search_query.strip().lower() in p['name'].lower() or search_query.strip().lower() in p['category'].lower()]
+    filtered_products = [p for p in product_records if active_query.lower() in p['name'].lower() or active_query.lower() in p['category'].lower()]
 
 if filtered_products:
     for i in range(0, len(filtered_products), 2):
