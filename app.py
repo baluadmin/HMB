@@ -33,7 +33,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
-NEW_GOOGLE_SCRIPT_URL = ""
 OWNER_PHONE_NUMBER = "9840450113"
 
 if "cart" not in st.session_state:
@@ -116,21 +115,12 @@ if st.session_state.current_view == "Cart":
                 if delivery_address.strip() and alt_contact.strip():
                     cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
                     
-                    # Construct WhatsApp Message & URL
+                    # Construct WhatsApp Message & URL directed to your mobile number
                     wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
                     st.session_state.last_order_wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
                     
-                    if NEW_GOOGLE_SCRIPT_URL:
-                        try:
-                            requests.post(NEW_GOOGLE_SCRIPT_URL, json={
-                                "Type": "Order", "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                                "Items": cart_summary, "Address": delivery_address, "Contact": alt_contact, "Description": custom_desc
-                            })
-                        except Exception:
-                            pass
-                    
-                    st.success("Order processed! Click below to send order via WhatsApp instantly:")
+                    st.success("Order processed successfully!")
                     st.session_state.cart = []
                 else:
                     st.warning("Please fill in both the delivery address and alternative contact number.")
