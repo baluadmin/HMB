@@ -38,10 +38,19 @@ NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OV
 NEW_GOOGLE_SCRIPT_URL = ""
 
 if "logged_in_user" not in st.session_state:
-    st.session_state.update({
-        "logged_in_user": None, "user_phone": None, "user_role": None,
-        "cart": [], "current_view": "Home", "selected_category": "", "quantities": {}
-    })
+    st.session_state.logged_in_user = None
+if "user_phone" not in st.session_state:
+    st.session_state.user_phone = None
+if "user_role" not in st.session_state:
+    st.session_state.user_role = None
+if "cart" not in st.session_state:
+    st.session_state.cart = []
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "Home"
+if "selected_category" not in st.session_state:
+    st.session_state.selected_category = ""
+if "quantities" not in st.session_state:
+    st.session_state.quantities = {}
 
 def log_login_to_sheet(name, phone):
     if not NEW_GOOGLE_SCRIPT_URL: return
@@ -58,7 +67,9 @@ if not st.session_state.logged_in_user:
         cust_phone = "".join([c for c in st.text_input("Mobile Number:", max_chars=10) if c.isdigit()])
         if st.form_submit_button("Proceed to Shop", use_container_width=True):
             if cust_name.strip() and len(cust_phone) == 10:
-                st.session_state.update({"logged_in_user": cust_name.strip(), "user_phone": cust_phone.strip(), "user_role": "Customer"})
+                st.session_state.logged_in_user = cust_name.strip()
+                st.session_state.user_phone = cust_phone.strip()
+                st.session_state.user_role = "Customer"
                 log_login_to_sheet(cust_name.strip(), cust_phone.strip())
                 st.success("✅ Welcome!")
                 st.rerun()
