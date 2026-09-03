@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 import pandas as pd
+import urllib.parse
 import requests
 import streamlit as st
 
@@ -33,6 +34,7 @@ st.markdown("""
 
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
 NEW_GOOGLE_SCRIPT_URL = ""
+OWNER_PHONE_NUMBER = "9840450113"
 
 if "cart" not in st.session_state:
     st.session_state.cart = []
@@ -40,6 +42,8 @@ if "search_query" not in st.session_state:
     st.session_state.search_query = ""
 if "current_view" not in st.session_state:
     st.session_state.current_view = "Shop"
+if "last_order_wa_link" not in st.session_state:
+    st.session_state.last_order_wa_link = ""
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -107,9 +111,16 @@ if st.session_state.current_view == "Cart":
             alt_contact = st.text_input("Alternative Contact Number:")
             custom_desc = st.text_area("Product Specifications / Custom Description:")
             
-            if st.form_submit_button("Complete Order", use_container_width=True):
+            submitted = st.form_submit_button("Complete Order", use_container_width=True)
+            if submitted:
                 if delivery_address.strip() and alt_contact.strip():
                     cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
+                    
+                    # Construct WhatsApp Message & URL
+                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+                    encoded_message = urllib.parse.quote(wa_message)
+                    st.session_state.last_order_wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
+                    
                     if NEW_GOOGLE_SCRIPT_URL:
                         try:
                             requests.post(NEW_GOOGLE_SCRIPT_URL, json={
@@ -118,12 +129,24 @@ if st.session_state.current_view == "Cart":
                             })
                         except Exception:
                             pass
-                    st.success("Order placed successfully!")
+                    
+                    st.success("Order processed! Click below to send order via WhatsApp instantly:")
                     st.session_state.cart = []
-                    st.session_state.current_view = "Shop"
-                    st.rerun()
                 else:
                     st.warning("Please fill in both the delivery address and alternative contact number.")
+
+        if st.session_state.last_order_wa_link:
+            st.markdown(f"""
+                <a href="{st.session_state.last_order_wa_link}" target="_blank">
+                    <button style="background: #22c55e; color: white; border: none; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; cursor: pointer; margin-top: 8px;">
+                        📲 Send Order to WhatsApp Now
+                    </button>
+                </a>
+            """, unsafe_allow_html=True)
+            if st.button("Return to Shop", use_container_width=True):
+                st.session_state.last_order_wa_link = ""
+                st.session_state.current_view = "Shop"
+                st.rerun()
     else:
         st.info("Your cart is empty.")
         if st.button("Back to Shop", use_container_width=True):
