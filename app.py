@@ -23,10 +23,10 @@ st.markdown("""
         .store-title { font-size: 16px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
         .store-subtitle { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 2px 0 0 0; }
 
-        /* Make buttons compact and small boxes instead of full-width blocks */
+        /* Compact buttons with zero extra spacing */
         div.stButton > button {
             background: #e11d48 !important;
-            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 11px !important; border-radius: 4px !important; padding: 3px 8px !important; min-height: unset !important;
+            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 4px !important; padding: 4px 6px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #be123c !important; }
 
@@ -86,14 +86,15 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-nav_c1, nav_c2, nav_c3, nav_c4 = st.columns([1.2, 0.9, 0.9, 0.9], gap="small")
-with nav_c1: st.markdown(f"👤 <span style='font-size:11px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
+# Right-aligned navigation using collapsed gaps and spacer column
+spacer_col, nav_c1, nav_c2, nav_c3, nav_c4 = st.columns([0.6, 1.2, 0.7, 0.8, 0.7], gap="collapsed")
+with spacer_col: st.markdown(f"👤 <span style='font-size:10px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
+with nav_c1:
+    if st.button("Shop", use_container_width=True): st.session_state.current_view = "Home"; st.rerun()
 with nav_c2:
-    if st.button("Shop", use_container_width=False): st.session_state.current_view = "Home"; st.rerun()
+    if st.button(f"Cart({len(st.session_state.cart)})", use_container_width=True): st.session_state.current_view = "Cart"; st.rerun()
 with nav_c3:
-    if st.button(f"Cart ({len(st.session_state.cart)})", use_container_width=False): st.session_state.current_view = "Cart"; st.rerun()
-with nav_c4:
-    if st.button("Logout", use_container_width=False): st.session_state.clear(); st.rerun()
+    if st.button("Logout", use_container_width=True): st.session_state.clear(); st.rerun()
 
 st.markdown("---")
 
@@ -171,17 +172,17 @@ if st.session_state.current_view == "Home":
                     st.markdown(f"**{prod['name']}**")
                     st.markdown(f"<span style='color:#e11d48; font-weight:800; font-size:12px;'>₹{prod['price']}</span> <span style='color:#64748b; font-size:10px;'>({prod['description']})</span>", unsafe_allow_html=True)
                 with action_col:
-                    m_btn, val_col, p_btn = st.columns([1, 1, 1], gap="small")
+                    m_btn, val_col, p_btn = st.columns([1, 1, 1], gap="collapsed")
                     with m_btn:
-                        if st.button("-", key=f"minus_{q_key}", use_container_width=False) and st.session_state.quantities[q_key] > 1:
+                        if st.button("-", key=f"minus_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
                             st.session_state.quantities[q_key] -= 1; st.rerun()
                     with val_col:
-                        st.markdown(f"<div style='text-align:center; font-weight:900; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                        st.markdown(f"<div style='text-align:center; font-weight:900; padding-top:4px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
                     with p_btn:
-                        if st.button("+", key=f"plus_{q_key}", use_container_width=False):
+                        if st.button("+", key=f"plus_{q_key}", use_container_width=True):
                             st.session_state.quantities[q_key] += 1; st.rerun()
                 
-                if st.button("Add to Cart", key=f"add_cart_{q_key}", use_container_width=False):
+                if st.button("Add to Cart", key=f"add_cart_{q_key}", use_container_width=True):
                     st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
                     st.success("Added to cart!")
                     st.rerun()
@@ -194,7 +195,7 @@ else:
             c1, c2 = st.columns([4, 1])
             with c1: st.markdown(f"- **{item['product']}** ({item['quantity']})")
             with c2:
-                if st.button("Remove", key=f"rem_item_{idx}", use_container_width=False):
+                if st.button("Remove", key=f"rem_item_{idx}", use_container_width=True):
                     st.session_state.cart.pop(idx); st.rerun()
         
         st.markdown("---")
@@ -202,7 +203,7 @@ else:
             address = st.text_area("Delivery Address:")
             sec_phone = "".join([c for c in st.text_input("Alternative Contact Number:", max_chars=10) if c.isdigit()])
             desc = st.text_input("Special Instructions:")
-            if st.form_submit_button("Complete Order", use_container_width=False):
+            if st.form_submit_button("Complete Order", use_container_width=True):
                 if address and len(sec_phone) == 10:
                     st.success(process_order_submission(address, sec_phone, desc))
                     st.session_state.current_view = "Home"
