@@ -11,7 +11,8 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
-        .block-container { padding-top: 0rem !important; padding-bottom: 0.3rem !important; padding-left: 0.3rem !important; padding-right: 0.3rem !important; max-width: 480px !important; margin: auto; }
+        /* Added more space at the top edge */
+        .block-container { padding-top: 1.2rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
 
         /* Ultra-compact button sizing for single-line fit */
@@ -67,7 +68,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Force Shop, Cart, and Logout in a single seamless line right at the top
+# Shop, Cart, and Logout in a single seamless line with top spacing
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
     if st.button("Shop", use_container_width=True):
@@ -83,7 +84,7 @@ with nav3:
         st.session_state.clear()
         st.rerun()
 
-st.markdown("<hr style='margin: 2px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
