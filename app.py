@@ -23,10 +23,10 @@ st.markdown("""
         .store-title { font-size: 14px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
         .store-subtitle { font-size: 9px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 1px 0 0 0; }
 
-        /* Ultra compact styling for single-line fit */
+        /* Compact button sizing to fit side-by-side */
         div.stButton > button {
             background: #e11d48 !important;
-            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 3px !important; padding: 2px 2px !important; min-height: unset !important; width: 100% !important;
+            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 3px !important; padding: 3px 2px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #be123c !important; }
 
@@ -86,8 +86,8 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Force profile info and all three action buttons into a single continuous row using micro-column weights
-user_col, b1, b2, b3 = st.columns([1.3, 0.8, 0.9, 0.8], gap="small")
+# Tight single-line layout using balanced mobile column widths
+user_col, b1, b2, b3 = st.columns([1.1, 0.8, 0.9, 0.8], gap="small")
 with user_col: st.markdown(f"👤 <span style='font-size:9px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
 with b1:
     if st.button("Shop", use_container_width=True): st.session_state.current_view = "Home"; st.rerun()
