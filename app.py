@@ -77,6 +77,17 @@ if not st.session_state.selected_category or st.session_state.selected_category 
     if all_categories:
         st.session_state.selected_category = all_categories[0]
 
+# Top Header Bar: Shop Name on Left, Cart Badge Button on Right
+top_col1, top_col2 = st.columns([3, 1], gap="small")
+with top_col1:
+    st.markdown("<h2 style='color: #881337; font-size: 15px; font-weight: 900; margin: 0; padding-top: 6px;'>🥜 HMB Nuts & Seeds</h2>", unsafe_allow_html=True)
+with top_col2:
+    cart_count = len(st.session_state.cart)
+    if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
+        st.info(f"Cart Items Count: {cart_count}")
+
+st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+
 # Search Bar
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
