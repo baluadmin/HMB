@@ -11,21 +11,21 @@ st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 12px !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 11px !important; }
         .stApp { background-color: #fff5f8 !important; }
-        .block-container { padding: 0.4rem 0.6rem !important; max-width: 100% !important; }
+        .block-container { padding: 0.3rem 0.4rem !important; max-width: 100% !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
         
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
             padding: 6px 8px; border-radius: 6px; text-align: center; margin-bottom: 6px; border: 1px solid #fbcfe8; width: 100%; box-sizing: border-box;
         }
-        .brand-banner .brand-title { font-size: 15px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
+        .brand-banner .brand-title { font-size: 14px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
         .brand-banner .brand-phone { font-size: 10px !important; font-weight: 800 !important; color: #9d174d !important; margin: 0; }
 
         div.stButton > button, div[data-testid="stFormSubmitButton"] > button {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%) !important;
-            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; width: 100% !important; padding: 6px !important;
+            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 4px !important; width: 100% !important; padding: 4px !important;
         }
 
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 1rem; width: 100%; }
@@ -33,7 +33,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Linked to your provided sheet (HMD FULL tab / CSV export)
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
 NEW_GOOGLE_SCRIPT_URL = ""
 
@@ -97,10 +96,9 @@ inv_df = load_inventory_from_sheet()
 product_records = []
 if not inv_df.empty:
     for _, row in inv_df.iterrows():
-        # Ensure row has enough items and skip empty rows where id/name is missing
-        if len(row) > 4 and pd.notna(row.iloc[0]) and pd.notna(row.iloc[1]):
+        if len(row) > 4 and pd.notna(row.iloc[0]) and pd.notna(row.iloc[1]) and str(row.iloc[0]).strip() != "id":
             product_records.append({
-                "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]),
+                "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]).strip(),
                 "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
                 "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "",
                 "image": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
@@ -110,13 +108,10 @@ if not product_records:
     product_records = [
         {"id": "ITM001", "name": "Premium California Almonds", "price": "850", "stock": "50", "category": "Nuts", "image": "", "description": ""},
         {"id": "ITM002", "name": "W320 Cashew Nuts", "price": "900", "stock": "40", "category": "Nuts", "image": "", "description": ""},
-        {"id": "ITM005", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "200", "category": "Seeds", "image": "", "description": ""},
-        {"id": "ITM009", "name": "Afghani Dried Black Raisins", "price": "450", "stock": "45", "category": "Dry Fruits", "image": "", "description": ""},
-        {"id": "ITM012", "name": "Mixed Dry Fruits Gift Box", "price": "1500", "stock": "60", "category": "Gift Box", "image": "", "description": ""}
+        {"id": "ITM005", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "200", "category": "Seeds", "image": "", "description": ""}
     ]
 
-# Set default selected category to the first available if not set or invalid
-all_categories = sorted(list(set([p['category'] for p in product_records])))
+all_categories = sorted(list(set([p['category'] for p in product_records if p['category']])))
 if not st.session_state.selected_menu or st.session_state.selected_menu not in all_categories:
     if all_categories:
         st.session_state.selected_menu = all_categories[0]
@@ -137,19 +132,20 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    cat_tab, prod_tab = st.tabs(["📂 Categories", "🥜 Products"])
+    # 30:70 horizontal split view on the single window
+    col_cat, col_prod = st.columns([0.3, 0.7], gap="small")
     
-    with cat_tab:
-        st.markdown("##### Select Category")
+    with col_cat:
+        st.markdown("##### Categories")
         for cat in all_categories:
-            if st.button(f"👉 {cat}", key=f"cat_tab_btn_{cat}", use_container_width=True):
+            btn_label = f"📍 {cat}" if st.session_state.selected_menu == cat else cat
+            if st.button(btn_label, key=f"cat_btn_{cat}", use_container_width=True):
                 st.session_state.selected_menu = cat
-                st.success(f"Selected: {cat}. Switch to Products tab!")
                 st.rerun()
 
-    with prod_tab:
-        current_cat = st.session_state.get("selected_menu", all_categories[0] if all_categories else "Nuts")
-        st.markdown(f"##### Products in: {current_cat}")
+    with col_prod:
+        current_cat = st.session_state.get("selected_menu", all_categories[0] if all_categories else "")
+        st.markdown(f"##### {current_cat}")
         filtered = [p for p in product_records if p['category'] == current_cat]
         
         if filtered:
@@ -158,7 +154,7 @@ if st.session_state.current_view == "Home":
                 if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                 
                 with st.container(border=True):
-                    pc1, pc2 = st.columns([2.2, 1.8], gap="small")
+                    pc1, pc2 = st.columns([2.0, 2.0], gap="small")
                     with pc1:
                         st.markdown(f"**{prod['name']}**<br><span style='color:#64748b;'>₹{prod['price']}</span>", unsafe_allow_html=True)
                     with pc2:
@@ -166,7 +162,7 @@ if st.session_state.current_view == "Home":
                         with q_m:
                             if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
                                 st.session_state.quantities[q_key] -= 1; st.rerun()
-                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:4px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
                         with q_p:
                             if st.button("+", key=f"p_{q_key}", use_container_width=True):
                                 st.session_state.quantities[q_key] += 1; st.rerun()
@@ -176,7 +172,7 @@ if st.session_state.current_view == "Home":
                         st.success("Added!")
                         st.rerun()
         else:
-            st.info("No items found in this category. Please add items to your Google Sheet.")
+            st.info("No items found.")
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
     if st.session_state.cart:
