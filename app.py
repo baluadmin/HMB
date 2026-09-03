@@ -22,7 +22,7 @@ st.markdown("""
         /* Lock screen width to prevent horizontal overflow or scrolling */
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
             max-width: 100vw !important;
             overflow-x: hidden !important;
         }
@@ -35,10 +35,10 @@ st.markdown("""
 
         /* Restrict main container margins so everything aligns safely on mobile screens */
         .block-container {
-            padding-top: 0.3rem !important;
+            padding-top: 0.2rem !important;
             padding-bottom: 0rem !important;
-            padding-left: 0.3rem !important;
-            padding-right: 0.3rem !important;
+            padding-left: 0.2rem !important;
+            padding-right: 0.2rem !important;
             max-width: 100% !important;
             overflow-x: hidden !important;
         }
@@ -87,16 +87,16 @@ st.markdown("""
             pointer-events: none !important;
         }
         
-        /* Enforce image sizing to precisely match your reference layout */
+        /* Enforce compact image sizing to fit mobile screens */
         [data-testid="stImage"] {
             width: 100% !important;
             pointer-events: none !important;
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 90px !important;
+            height: 60px !important;
             object-fit: cover !important;
-            border-radius: 6px !important;
+            border-radius: 4px !important;
             pointer-events: none !important;
         }
         
@@ -104,7 +104,7 @@ st.markdown("""
         label, .stTextInput label, p, span, div[data-testid="stMarkdownContainer"] p {
             color: #0f172a !important;
             font-weight: 700 !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
         }
         
         /* Input boxes styling with explicit light mode colors */
@@ -112,9 +112,9 @@ st.markdown("""
             background-color: #ffffff !important;
             color: #0f172a !important;
             border: 2px solid #cbd5e1 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 700 !important;
-            border-radius: 8px !important;
+            border-radius: 6px !important;
             box-sizing: border-box !important;
         }
         input:focus, textarea:focus {
@@ -125,19 +125,19 @@ st.markdown("""
         /* Soft Light Pink Gradient Header Banner */
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
-            padding: 6px 8px;
-            border-radius: 8px;
+            padding: 5px 6px;
+            border-radius: 6px;
             color: #831843 !important;
             text-align: center;
-            box-shadow: 0 2px 8px -2px rgba(251, 207, 232, 0.3);
-            margin-bottom: 4px;
+            box-shadow: 0 2px 6px -2px rgba(251, 207, 232, 0.3);
+            margin-bottom: 3px;
             border: 1px solid #fbcfe8;
             width: 100%;
             box-sizing: border-box;
         }
         .brand-banner .brand-title {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 19px !important;
+            font-size: 16px !important;
             font-weight: 900 !important;
             letter-spacing: 0.5px;
             color: #831843 !important;
@@ -145,7 +145,7 @@ st.markdown("""
             text-transform: lowercase;
         }
         .brand-banner .brand-phone {
-            font-size: 12px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
             letter-spacing: 0.5px;
             color: #9d174d !important;
@@ -158,12 +158,12 @@ st.markdown("""
             color: #0f172a !important;
             border: 1px solid #f472b6 !important;
             font-weight: 800 !important;
-            font-size: 13px !important;
-            border-radius: 6px !important;
-            padding: 0.2rem 0.3rem !important;
+            font-size: 12px !important;
+            border-radius: 5px !important;
+            padding: 0.15rem 0.2rem !important;
             width: 100% !important;
             display: block !important;
-            box-shadow: 0 2px 6px rgba(251, 207, 232, 0.4) !important;
+            box-shadow: 0 2px 4px rgba(251, 207, 232, 0.4) !important;
             transition: all 0.2s ease-in-out;
         }
         div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover {
@@ -171,7 +171,7 @@ st.markdown("""
             color: #0f172a !important;
         }
 
-        /* Force side-by-side layout for ALL screen sizes */
+        /* Force side-by-side layout for all screens, shrinking fluidly */
         div[data-testid="stHorizontalBlock"] {
             display: flex !important;
             flex-direction: row !important;
@@ -191,56 +191,56 @@ st.markdown("""
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-top: 1.5rem;
+            padding-top: 1rem;
             width: 100%;
             box-sizing: border-box;
         }
 
         .login-title {
             text-align: center;
-            margin: 5px 0 15px 0;
+            margin: 5px 0 10px 0;
             width: 100%;
-            padding: 0 10px;
+            padding: 0 5px;
             box-sizing: border-box;
         }
 
         .login-title h1 {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 24px !important;
+            font-size: 20px !important;
             font-weight: 900 !important;
-            margin: 0 0 5px 0;
+            margin: 0 0 3px 0;
             color: #0f172a !important;
             text-transform: lowercase;
         }
 
         .login-title p {
-            font-size: 12px !important;
+            font-size: 11px !important;
             color: #64748b !important;
             margin: 0;
         }
 
         .login-card-container {
             width: 100%;
-            max-width: 380px;
+            max-width: 340px;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 0 5px;
             box-sizing: border-box;
         }
 
         .login-card {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             background-color: #ffffff !important;
             border: 2px solid #fbcfe8 !important;
-            box-shadow: 0 8px 20px -5px rgba(251, 207, 232, 0.3);
+            box-shadow: 0 6px 15px -4px rgba(251, 207, 232, 0.3);
             text-align: center;
             box-sizing: border-box;
         }
 
         .login-card h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px !important;
+            margin: 0 0 6px 0;
+            font-size: 15px !important;
             font-weight: 800 !important;
             color: #1e293b !important;
         }
@@ -352,7 +352,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Navigation row: Welcome message, Home, Cart, Logout forced strictly into a single horizontal line
-top_comm, top_c1, top_c2, top_c3 = st.columns([1.5, 1, 1, 1], gap="small")
+top_comm, top_c1, top_c2, top_c3 = st.columns([1.4, 0.9, 1, 0.9], gap="small")
 with top_comm:
     st.markdown(f"👋 **{st.session_state.logged_in_user}**")
 with top_c1:
@@ -467,8 +467,8 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- TWO-COLUMN LAYOUT MATCHING REFERENCE IMAGE ---
-    col_menu, col_items = st.columns([1.1, 2.4], gap="small")
+    # --- FLUID RESPONSIVE TWO-COLUMN LAYOUT ---
+    col_menu, col_items = st.columns([0.9, 2.5], gap="small")
 
     with col_menu:
         st.markdown("#### Menu")
@@ -503,7 +503,7 @@ if st.session_state.current_view == "Home":
                     st.session_state.quantities[qty_key] = 1
 
                 with st.container(border=True):
-                    p_img_col, p_info_col, p_qty_col = st.columns([2.2, 1.3, 1.3], gap="small")
+                    p_img_col, p_info_col, p_qty_col = st.columns([2.0, 1.4, 1.4], gap="small")
                     
                     with p_img_col:
                         raw_img = prod.get("image", "")
@@ -519,7 +519,7 @@ if st.session_state.current_view == "Home":
                                 if i < len(valid_paths):
                                     st.image(valid_paths[i], use_container_width=True)
                                 else:
-                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 10px;'>No Img</p>", unsafe_allow_html=True)
+                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 9px;'>No Img</p>", unsafe_allow_html=True)
 
                     with p_info_col:
                         st.markdown(f"**{prod['name']}**")
@@ -533,7 +533,7 @@ if st.session_state.current_view == "Home":
                                     st.session_state.quantities[qty_key] -= 1
                                     st.rerun()
                         with q_display:
-                            st.markdown(f"<div style='text-align: center; padding-top: 2px; font-weight: 800; font-size: 13px;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='text-align: center; padding-top: 1px; font-weight: 800; font-size: 12px;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
                         with q_plus:
                             if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
                                 st.session_state.quantities[qty_key] += 1
@@ -555,7 +555,7 @@ if st.session_state.current_view == "Home":
                             st.session_state.product_page -= 1
                             st.rerun()
                 with pg_info:
-                    st.markdown(f"<p style='text-align: center; margin-top: 4px; font-size: 12px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
+                    st.markdown(f"<p style='text-align: center; margin-top: 2px; font-size: 11px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
                 with pg_next:
                     if st.button("Next ➡", use_container_width=True):
                         if st.session_state.product_page < total_pages - 1:
