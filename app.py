@@ -38,6 +38,8 @@ if "cart" not in st.session_state:
     st.session_state.cart = []
 if "search_query" not in st.session_state:
     st.session_state.search_query = ""
+if "current_view" not in st.session_state:
+    st.session_state.current_view = "Shop"
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -73,116 +75,156 @@ if not product_records:
 # Top Header Bar: Shop Name on Left, Cart Badge Button on Right
 top_col1, top_col2 = st.columns([3, 1], gap="small")
 with top_col1:
-    st.markdown("<h2 style='color: #881337; font-size: 15px; font-weight: 900; margin: 0; padding-top: 6px;'>🥜 HMB Nuts & Seeds</h2>", unsafe_allow_html=True)
+    if st.button("🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True):
+        st.session_state.current_view = "Shop"
+        st.rerun()
 with top_col2:
     cart_count = len(st.session_state.cart)
     if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
-        st.info(f"Cart Items Count: {cart_count}")
+        st.session_state.current_view = "Cart"
+        st.rerun()
 
 st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search Bar widget using session state safely without key collision
-search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
-if search_query != st.session_state.search_query:
-    st.session_state.search_query = search_query
-    st.rerun()
-
-active_query = st.session_state.search_query.strip().lower()
-
-# Flexible substring and character match search algorithm to handle typos/partial queries
-def get_matching_products(query, products):
-    if not query:
-        return products
+if st.session_state.current_view == "Cart":
+    st.markdown("### Your Shopping Cart & Checkout")
     
-    exact_matches = []
-    fuzzy_matches = []
-    
-    for p in products:
-        name_lower = p['name'].lower()
-        cat_lower = p['category'].lower()
+    if st.session_state.cart:
+        for idx, item in enumerate(st.session_state.cart):
+            c1, c2 = st.columns([3, 1], gap="small")
+            with c1:
+                st.markdown(f"- **{item['product']}** ({item['quantity']})")
+            with c2:
+                if st.button("Remove Item", key=f"rem_{idx}", use_container_width=True):
+                    st.session_state.cart.pop(idx)
+                    st.rerun()
         
-        if query in name_lower or query in cat_lower:
-            exact_matches.append(p)
-        else:
-            query_chars = set(query)
-            name_chars = set(name_lower)
-            common_chars = query_chars.intersection(name_chars)
-            if len(common_chars) >= max(1, len(query_chars) - 2):
-                fuzzy_matches.append(p)
-                
-    seen_ids = set()
-    final_list = []
-    for p in exact_matches + fuzzy_matches:
-        if p['id'] not in seen_ids:
-            seen_ids.add(p['id'])
-            final_list.append(p)
+        st.markdown("<hr style='margin: 8px 0;'>", unsafe_allow_html=True)
+        st.markdown("### Secure Checkout Form")
+        
+        with st.form("checkout_form"):
+            delivery_address = st.text_area("Delivery Address:")
+            alt_contact = st.text_input("Alternative Contact Number:")
+            custom_desc = st.text_area("Product Specifications / Custom Description:")
             
-    return final_list
+            if st.form_submit_button("Complete Order", use_container_width=True):
+                if delivery_address.strip() and alt_contact.strip():
+                    cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
+                    if NEW_GOOGLE_SCRIPT_URL:
+                        try:
+                            requests.post(NEW_GOOGLE_SCRIPT_URL, json={
+                                "Type": "Order", "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                "Items": cart_summary, "Address": delivery_address, "Contact": alt_contact, "Description": custom_desc
+                            })
+                        except Exception:
+                            pass
+                    st.success("Order placed successfully!")
+                    st.session_state.cart = []
+                    st.session_state.current_view = "Shop"
+                    st.rerun()
+                else:
+                    st.warning("Please fill in both the delivery address and alternative contact number.")
+    else:
+        st.info("Your cart is empty.")
+        if st.button("Back to Shop", use_container_width=True):
+            st.session_state.current_view = "Shop"
+            st.rerun()
 
-# Dropdown suggestion list for partial/misspelled inputs
-matching_suggestions = []
-if active_query:
-    matching_suggestions = get_matching_products(active_query, product_records)
-
-if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
-    st.markdown("""
-        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
-    """, unsafe_allow_html=True)
-    
-    for idx, prod in enumerate(matching_suggestions[:6]):
-        sug_col1, sug_col2 = st.columns([1, 5], gap="small")
-        with sug_col1:
-            st.markdown("""
-                <div style="background: #f1f5f9; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
-            """, unsafe_allow_html=True)
-        with sug_col2:
-            if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
-                st.session_state.search_query = prod['name']
-                st.rerun()
-                
-    st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-
-# Filter products or show default inventory instantly if cleared
-if not active_query:
-    filtered_products = product_records
 else:
-    filtered_products = get_matching_products(active_query, product_records)
+    # Search Bar widget using session state safely without key collision
+    search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
+    if search_query != st.session_state.search_query:
+        st.session_state.search_query = search_query
+        st.rerun()
 
-if filtered_products:
-    for i in range(0, len(filtered_products), 2):
-        cols = st.columns(2, gap="small")
-        for j in range(2):
-            if i + j < len(filtered_products):
-                prod = filtered_products[i + j]
-                idx = i + j
-                
-                raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
-                base_price = float(raw_price_str) if raw_price_str else 0.0
-                mrp_price = int(base_price * 1.1)
-                
-                with cols[j]:
-                    with st.container(border=True):
-                        st.markdown(
-                            f"""
-                            <div style="background: #ffffff; border-radius: 8px;">
-                                <div style="background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
-                                    📦 PRODUCT IMG
+    active_query = st.session_state.search_query.strip().lower()
+
+    def get_matching_products(query, products):
+        if not query:
+            return products
+        exact_matches = []
+        fuzzy_matches = []
+        for p in products:
+            name_lower = p['name'].lower()
+            cat_lower = p['category'].lower()
+            if query in name_lower or query in cat_lower:
+                exact_matches.append(p)
+            else:
+                query_chars = set(query)
+                name_chars = set(name_lower)
+                common_chars = query_chars.intersection(name_chars)
+                if len(common_chars) >= max(1, len(query_chars) - 2):
+                    fuzzy_matches.append(p)
+        seen_ids = set()
+        final_list = []
+        for p in exact_matches + fuzzy_matches:
+            if p['id'] not in seen_ids:
+                seen_ids.add(p['id'])
+                final_list.append(p)
+        return final_list
+
+    matching_suggestions = []
+    if active_query:
+        matching_suggestions = get_matching_products(active_query, product_records)
+
+    if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
+        st.markdown("""
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+        """, unsafe_allow_html=True)
+        
+        for idx, prod in enumerate(matching_suggestions[:6]):
+            sug_col1, sug_col2 = st.columns([1, 5], gap="small")
+            with sug_col1:
+                st.markdown("""
+                    <div style="background: #f1f5f9; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
+                """, unsafe_allow_html=True)
+            with sug_col2:
+                if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
+                    st.session_state.search_query = prod['name']
+                    st.rerun()
+                    
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+
+    if not active_query:
+        filtered_products = product_records
+    else:
+        filtered_products = get_matching_products(active_query, product_records)
+
+    if filtered_products:
+        for i in range(0, len(filtered_products), 2):
+            cols = st.columns(2, gap="small")
+            for j in range(2):
+                if i + j < len(filtered_products):
+                    prod = filtered_products[i + j]
+                    idx = i + j
+                    
+                    raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
+                    base_price = float(raw_price_str) if raw_price_str else 0.0
+                    mrp_price = int(base_price * 1.1)
+                    
+                    with cols[j]:
+                        with st.container(border=True):
+                            st.markdown(
+                                f"""
+                                <div style="background: #ffffff; border-radius: 8px;">
+                                    <div style="background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
+                                        📦 PRODUCT IMG
+                                    </div>
+                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
+                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
+                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
+                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
-                                <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
-                                <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
-                                <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
-                                <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
-                            </div>
-                            """, 
-                            unsafe_allow_html=True
-                        )
-                        
-                        if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
-                            st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
-                            st.success("Added!")
-                            st.rerun()
-else:
-    st.info("No items found.")
+                                """, 
+                                unsafe_allow_html=True
+                            )
+                            
+                            if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
+                                st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
+                                st.success("Added!")
+                                st.rerun()
+    else:
+        st.info("No items found.")
