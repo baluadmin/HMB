@@ -36,6 +36,8 @@ NEW_GOOGLE_SCRIPT_URL = ""
 
 if "cart" not in st.session_state:
     st.session_state.cart = []
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -79,16 +81,13 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search state management
-if "search_query" not in st.session_state:
-    st.session_state.search_query = ""
+# Search Bar widget using session state safely without key collision
+search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
+if search_query != st.session_state.search_query:
+    st.session_state.search_query = search_query
+    st.rerun()
 
-def handle_search_update():
-    st.session_state.search_query = st.session_state.search_input_field
-
-search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input_field", on_change=handle_search_update, label_visibility="collapsed")
-
-active_query = st.session_state.search_input_field.strip().lower()
+active_query = st.session_state.search_query.strip().lower()
 
 # Flexible substring and character match search algorithm to handle typos/partial queries
 def get_matching_products(query, products):
@@ -96,7 +95,6 @@ def get_matching_products(query, products):
         return products
     
     exact_matches = []
-    partial_matches = []
     fuzzy_matches = []
     
     for p in products:
@@ -106,14 +104,12 @@ def get_matching_products(query, products):
         if query in name_lower or query in cat_lower:
             exact_matches.append(p)
         else:
-            # Handle minor typos by checking if most characters or words overlap
             query_chars = set(query)
             name_chars = set(name_lower)
             common_chars = query_chars.intersection(name_chars)
             if len(common_chars) >= max(1, len(query_chars) - 2):
                 fuzzy_matches.append(p)
                 
-    # Combine results, ensuring unique products
     seen_ids = set()
     final_list = []
     for p in exact_matches + fuzzy_matches:
@@ -142,7 +138,6 @@ if matching_suggestions and active_query != matching_suggestions[0]['name'].lowe
         with sug_col2:
             if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
                 st.session_state.search_query = prod['name']
-                st.session_state.search_input_field = prod['name']
                 st.rerun()
                 
     st.markdown("</div>", unsafe_allow_html=True)
