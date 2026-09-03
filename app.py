@@ -36,10 +36,6 @@ NEW_GOOGLE_SCRIPT_URL = ""
 
 if "cart" not in st.session_state:
     st.session_state.cart = []
-if "selected_category" not in st.session_state:
-    st.session_state.selected_category = ""
-if "show_categories" not in st.session_state:
-    st.session_state.show_categories = False
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -72,11 +68,6 @@ if not product_records:
         {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "250g"}
     ]
 
-all_categories = sorted(list(set([p['category'] for p in product_records if p['category']])))
-if not st.session_state.selected_category or st.session_state.selected_category not in all_categories:
-    if all_categories:
-        st.session_state.selected_category = all_categories[0]
-
 # Top Header Bar: Shop Name on Left, Cart Badge Button on Right
 top_col1, top_col2 = st.columns([3, 1], gap="small")
 with top_col1:
@@ -91,28 +82,12 @@ st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid
 # Search Bar
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
-# Toggle button to display categories only when clicked
-if st.button("📂 Browse Categories", use_container_width=True):
-    st.session_state.show_categories = not st.session_state.show_categories
-    st.rerun()
-
-# Show category pills only if toggled open
-if st.session_state.show_categories and all_categories:
-    cat_cols = st.columns(len(all_categories), gap="small")
-    for i, cat in enumerate(all_categories):
-        with cat_cols[i]:
-            if st.button(cat, key=f"pill_{cat}", use_container_width=True):
-                st.session_state.selected_category = cat
-                st.session_state.show_categories = False
-                st.rerun()
-
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
 
 if search_query.strip():
     filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
 else:
-    filtered_products = [p for p in product_records if p['category'] == current_cat]
+    filtered_products = product_records
 
 if filtered_products:
     for i in range(0, len(filtered_products), 2):
