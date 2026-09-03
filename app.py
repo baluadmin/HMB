@@ -38,8 +38,8 @@ if "cart" not in st.session_state:
     st.session_state.cart = []
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = ""
-if "quantities" not in st.session_state:
-    st.session_state.quantities = {}
+if "show_categories" not in st.session_state:
+    st.session_state.show_categories = False
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -91,13 +91,19 @@ st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid
 # Search Bar
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
-# Category Pill Navigation Buttons
-if all_categories:
+# Toggle button to display categories only when clicked
+if st.button("📂 Browse Categories", use_container_width=True):
+    st.session_state.show_categories = not st.session_state.show_categories
+    st.rerun()
+
+# Show category pills only if toggled open
+if st.session_state.show_categories and all_categories:
     cat_cols = st.columns(len(all_categories), gap="small")
     for i, cat in enumerate(all_categories):
         with cat_cols[i]:
             if st.button(cat, key=f"pill_{cat}", use_container_width=True):
                 st.session_state.selected_category = cat
+                st.session_state.show_categories = False
                 st.rerun()
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
