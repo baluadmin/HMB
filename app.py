@@ -23,9 +23,10 @@ st.markdown("""
         .store-title { font-size: 16px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
         .store-subtitle { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 2px 0 0 0; }
 
+        /* Slim down button sizing to prevent large empty spacing */
         div.stButton > button {
             background: #e11d48 !important;
-            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 4px !important; padding: 4px 6px !important; min-height: unset !important; width: 100% !important;
+            color: #ffffff !important; border: none !important; font-weight: 700 !important; font-size: 10px !important; border-radius: 4px !important; padding: 2px 4px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #be123c !important; }
 
@@ -85,14 +86,14 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Fixed gap parameter from "collapsed" to "small"
-spacer_col, nav_c1, nav_c2, nav_c3, nav_c4 = st.columns([0.6, 1.2, 0.7, 0.8, 0.7], gap="small")
-with spacer_col: st.markdown(f"👤 <span style='font-size:10px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
-with nav_c1:
+# Compact tight layout pushed to the right side
+user_col, b1, b2, b3 = st.columns([1.6, 0.7, 0.7, 0.7], gap="small")
+with user_col: st.markdown(f"👤 <span style='font-size:10px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
+with b1:
     if st.button("Shop", use_container_width=True): st.session_state.current_view = "Home"; st.rerun()
-with nav_c2:
+with b2:
     if st.button(f"Cart({len(st.session_state.cart)})", use_container_width=True): st.session_state.current_view = "Cart"; st.rerun()
-with nav_c3:
+with b3:
     if st.button("Logout", use_container_width=True): st.session_state.clear(); st.rerun()
 
 st.markdown("---")
