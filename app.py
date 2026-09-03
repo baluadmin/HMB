@@ -6,29 +6,31 @@ import pandas as pd
 import requests
 import streamlit as st
 
-# 1. Streamlit Page Configuration & Professional E-Commerce Styling CSS (Forced Desktop View on Mobile)
+# 1. Streamlit Page Configuration & Professional E-Commerce Styling CSS (Mobile-Optimized Responsive View)
 st.set_page_config(
     page_title="HMB Nuts and Seeds",
     page_icon="🥜",
     layout="wide",
 )
 
-# Force a fixed desktop viewport width (1200px) so mobile browsers render the full desktop layout without stacking
+# Fluid responsive viewport scaling for mobile devices
 st.markdown("""
-    <meta name="viewport" content="width=1200">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
 
-        /* Apply font family globally and enforce fixed minimum desktop width */
+        /* Apply font family globally */
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
             font-size: 14px !important;
-            min-width: 1200px !important;
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
         }
 
         .stApp {
             background-color: #fff5f8 !important; 
-            min-width: 1200px !important;
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
         }
 
         .block-container {
@@ -37,7 +39,7 @@ st.markdown("""
             padding-left: 0.4rem !important;
             padding-right: 0.4rem !important;
             max-width: 100% !important;
-            min-width: 1200px !important;
+            overflow-x: hidden !important;
         }
 
         /* Hide Streamlit default top header, menu, share, github, and badges */
@@ -165,6 +167,20 @@ st.markdown("""
         div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover {
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%) !important;
             color: #0f172a !important;
+        }
+
+        /* Responsive layout rules: on mobile screens (< 768px), stack the Menu and Products vertically so nothing is cut off */
+        @media (max-width: 768px) {
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                flex-wrap: wrap !important;
+            }
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+                padding: 2px 0px !important;
+            }
         }
 
         /* Centered Login Wrapper */
@@ -324,7 +340,7 @@ if not st.session_state.logged_in_user:
     st.stop()
 
 
-# --- AFTER LOGIN: DESKTOP HEADER & NAVIGATION ---
+# --- AFTER LOGIN: RESPONSIVE HEADER & NAVIGATION ---
 st.markdown("""
     <div class="brand-banner">
         <h1 class="brand-title">hmb nuts and seeds thiruverkadu</h1>
@@ -447,7 +463,7 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- DESKTOP LAYOUT (Maintains side-by-side view on mobile via fixed 1200px viewport) ---
+    # --- RESPONSIVE LAYOUT (Stacks vertically on mobile, side-by-side on desktop) ---
     col_menu, col_items = st.columns([1.1, 2.4], gap="small")
 
     with col_menu:
@@ -467,7 +483,7 @@ if st.session_state.current_view == "Home":
         if filtered_items:
             items_per_page = 5
             total_items = len(filtered_items)
-            total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
+            total_pages = max(1, (total_items + items_per_page - 1) / items_per_page)
             
             if st.session_state.product_page >= total_pages:
                 st.session_state.product_page = 0
@@ -483,48 +499,39 @@ if st.session_state.current_view == "Home":
                     st.session_state.quantities[qty_key] = 1
 
                 with st.container(border=True):
-                    p_img_col, p_info_col, p_qty_col = st.columns([2.2, 1.3, 1.3], gap="small")
+                    # --- MOBILE FRIENDLY CARD LAYOUT (Stacked components per row) ---
+                    raw_img = prod.get("image", "")
+                    if raw_img:
+                        img_paths = [img.strip() for img in raw_img.replace("\\", ",").split(",") if img.strip()]
+                        valid_paths = [p for p in img_paths if os.path.exists(p)]
+                    else:
+                        valid_paths = []
                     
-                    with p_img_col:
-                        raw_img = prod.get("image", "")
-                        if raw_img:
-                            img_paths = [img.strip() for img in raw_img.replace("\\", ",").split(",") if img.strip()]
-                            valid_paths = [p for p in img_paths if os.path.exists(p)]
-                        else:
-                            valid_paths = []
-                        
-                        icols = st.columns(3, gap="small")
-                        for i in range(3):
-                            with icols[i]:
-                                if i < len(valid_paths):
-                                    st.image(valid_paths[i], use_container_width=True)
-                                else:
-                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 10px;'>No Img</p>", unsafe_allow_html=True)
+                    if valid_paths:
+                        st.image(valid_paths[0], use_container_width=True)
+                    
+                    st.markdown(f"**{prod['name']}**")
+                    st.markdown(f"**₹{prod['price']}**")
 
-                    with p_info_col:
-                        st.markdown(f"**{prod['name']}**")
-                        st.markdown(f"**₹{prod['price']}**")
-
-                    with p_qty_col:
-                        q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
-                        with q_minus:
-                            if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
-                                if st.session_state.quantities[qty_key] > 1:
-                                    st.session_state.quantities[qty_key] -= 1
-                                    st.rerun()
-                        with q_display:
-                            st.markdown(f"<div style='text-align: center; padding-top: 2px; font-weight: 800; font-size: 13px;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
-                        with q_plus:
-                            if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
-                                st.session_state.quantities[qty_key] += 1
+                    q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
+                    with q_minus:
+                        if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
+                            if st.session_state.quantities[qty_key] > 1:
+                                st.session_state.quantities[qty_key] -= 1
                                 st.rerun()
-                        
-                        if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
-                            qty_val = st.session_state.quantities[qty_key]
-                            full_q_str = f"{qty_val} Units"
-                            st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
-                            st.success(f"Added!")
+                    with q_display:
+                        st.markdown(f"<div style='text-align: center; padding-top: 2px; font-weight: 800; font-size: 13px;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
+                    with q_plus:
+                        if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
+                            st.session_state.quantities[qty_key] += 1
                             st.rerun()
+                    
+                    if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
+                        qty_val = st.session_state.quantities[qty_key]
+                        full_q_str = f"{qty_val} Units"
+                        st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
+                        st.success(f"Added!")
+                        st.rerun()
             
             # Pagination Controls at the bottom
             if total_pages > 1:
