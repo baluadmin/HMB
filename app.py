@@ -1,37 +1,35 @@
 from datetime import datetime
-import csv
 import os
 import pandas as pd
 import requests
 import streamlit as st
 
-st.set_page_config(page_title="HMB Nuts and Seeds", page_icon="🥜", layout="centered")
+st.set_page_config(page_title="HMB Nuts & Spices", page_icon="🥜", layout="centered")
 
 st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 11px !important; }
-        .stApp { background-color: #f8fafc !important; }
-        .block-container { padding: 0.3rem !important; max-width: 100% !important; }
-        #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
+        .block-container { padding: 0.4rem 0.6rem !important; max-width: 480px !important; margin: auto; }
+        #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
         
-        .store-header {
+        .app-header {
             background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            padding: 8px 12px; border-radius: 8px; text-align: center; margin-bottom: 8px; border: 1px solid #fecdd3;
+            padding: 10px 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #fecdd3;
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
-        .store-title { font-size: 15px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
-        .store-subtitle { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 2px 0 0 0; }
+        .app-title { font-size: 15px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
+        .app-sub { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 0; }
 
-        /* Quick-commerce button style */
+        /* Mobile app bottom or top navigation strip styling */
         div.stButton > button {
             background: #ffffff !important;
-            color: #0284c7 !important; border: 1px solid #bae6fd !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
+            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 8px !important; padding: 6px !important; min-height: unset !important; width: 100% !important;
         }
-        div.stButton > button:hover { background: #f0f9ff !important; }
+        div.stButton > button:hover { background: #fff1f2 !important; }
 
-        .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 2rem; width: 100%; }
-        .login-card { width: 100%; max-width: 360px; padding: 14px; border-radius: 10px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .login-box { width: 100%; max-width: 380px; padding: 20px; border-radius: 14px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 40px auto; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -42,12 +40,10 @@ if "logged_in_user" not in st.session_state:
     st.session_state.logged_in_user = None
 if "user_phone" not in st.session_state:
     st.session_state.user_phone = None
-if "user_role" not in st.session_state:
-    st.session_state.user_role = None
 if "cart" not in st.session_state:
     st.session_state.cart = []
 if "current_view" not in st.session_state:
-    st.session_state.current_view = "Home"
+    st.session_state.current_view = "Shop"
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = ""
 if "quantities" not in st.session_state:
@@ -61,42 +57,54 @@ def log_login_to_sheet(name, phone):
         pass
 
 if not st.session_state.logged_in_user:
-    st.markdown('<div class="login-wrapper"><div style="text-align:center; margin-bottom:10px;"><h2>HMB Nuts & Seeds</h2><p style="color:#64748b; font-size:11px;">Thiruverkadu - 📞 9840450113</p></div>', unsafe_allow_html=True)
-    st.markdown('<div class="login-card"><h4 style="color:#881337; margin-bottom:8px; font-size:14px;">Customer Sign In</h4>', unsafe_allow_html=True)
-    with st.form("customer_login_form"):
-        cust_name = st.text_input("Your Name:")
-        cust_phone = "".join([c for c in st.text_input("Mobile Number:", max_chars=10) if c.isdigit()])
-        if st.form_submit_button("Proceed to Shop", use_container_width=True):
+    st.markdown('<div style="display: flex; justify-content: center;"><div class="login-box">', unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #881337; margin-bottom: 4px;'>🥜 HMB Nuts & Spices</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748b; font-size: 11px; margin-bottom: 16px;'>Thiruverkadu | Customer Login</p>", unsafe_allow_html=True)
+    with st.form("mobile_login_form"):
+        cust_name = st.text_input("Your Full Name:")
+        cust_phone = "".join([c for c in st.text_input("Mobile Number (10 digits):", max_chars=10) if c.isdigit()])
+        if st.form_submit_button("Get Started", use_container_width=True):
             if cust_name.strip() and len(cust_phone) == 10:
                 st.session_state.logged_in_user = cust_name.strip()
                 st.session_state.user_phone = cust_phone.strip()
-                st.session_state.user_role = "Customer"
                 log_login_to_sheet(cust_name.strip(), cust_phone.strip())
-                st.success("✅ Welcome!")
+                st.success("Welcome!")
                 st.rerun()
             else:
-                st.warning("⚠️ Enter valid name and 10-digit mobile number.")
+                st.warning("Please enter a valid name and 10-digit mobile number.")
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-st.markdown("""
-    <div class="store-header">
-        <h1 class="store-title">HMB Nuts & Spices</h1>
-        <p class="store-subtitle">Thiruverkadu | Fresh Daily Essentials 📞 9840450113</p>
+# Mobile App Header Bar
+st.markdown(f"""
+    <div class="app-header">
+        <div>
+            <h1 class="app-title">HMB Nuts & Spices</h1>
+            <p class="app-sub">Hi, {st.session_state.logged_in_user} 👋</p>
+        </div>
+        <div style="text-align: right;">
+            <span style="background: #e11d48; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 800;">Thiruverkadu</span>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
-# Compact single line header bar
-user_col, b1, b2, b3 = st.columns([1.1, 0.8, 0.9, 0.8], gap="small")
-with user_col: st.markdown(f"👤 <span style='font-size:9px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
-with b1:
-    if st.button("Shop", use_container_width=True): st.session_state.current_view = "Home"; st.rerun()
-with b2:
-    if st.button(f"Cart({len(st.session_state.cart)})", use_container_width=True): st.session_state.current_view = "Cart"; st.rerun()
-with b3:
-    if st.button("Logout", use_container_width=True): st.session_state.clear(); st.rerun()
+# App Navigation Bar (Shop, Cart with badge, Logout)
+nav1, nav2, nav3 = st.columns(3, gap="small")
+with nav1:
+    if st.button("🏠 Shop", use_container_width=True):
+        st.session_state.current_view = "Shop"
+        st.rerun()
+with nav2:
+    cart_count = len(st.session_state.cart)
+    if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
+        st.session_state.current_view = "Cart"
+        st.rerun()
+with nav3:
+    if st.button("🚪 Logout", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
 
-st.markdown("---")
+st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -148,77 +156,80 @@ def process_order_submission(address, secondary_phone, description):
     st.session_state.cart = []
     return f"Order placed successfully for: {cart_summary}!"
 
-if st.session_state.current_view == "Home":
-    # Blinkit style search input bar at the top
-    search_query = st.text_input("Search for items...", placeholder="🔍 Search for 'Almonds', 'Cashew'...", label_visibility="collapsed")
+if st.session_state.current_view == "Shop":
+    # Search input bar matching modern quick-commerce UI
+    search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
-    # Category Pill Filter Buttons (like Zepto/Blinkit category bubbles)
+    # Horizontal Category Pills selection
     if all_categories:
-        st.markdown("<div style='font-size:11px; font-weight:800; color:#334155; margin: 6px 0;'>EXPLORE CATEGORIES</div>", unsafe_allow_html=True)
         cat_cols = st.columns(len(all_categories), gap="small")
         for i, cat in enumerate(all_categories):
             with cat_cols[i]:
+                is_selected = (st.session_state.selected_category == cat)
+                btn_type = "primary" if is_selected else "secondary"
                 if st.button(cat, key=f"pill_{cat}", use_container_width=True):
                     st.session_state.selected_category = cat
                     st.rerun()
 
-    st.markdown("---")
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
     current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
-    st.markdown(f"##### 📦 {current_cat} Special")
     
-    # Filter products by search query or selected category
     if search_query.strip():
         filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
     else:
         filtered_products = [p for p in product_records if p['category'] == current_cat]
-    
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
+
     if filtered_products:
-        # Quick-commerce 2-column grid layout with clean cards and ADD buttons
+        # 2-column mobile app product grid
         for i in range(0, len(filtered_products), 2):
             cols = st.columns(2, gap="small")
             for j in range(2):
                 if i + j < len(filtered_products):
                     prod = filtered_products[i + j]
                     idx = i + j
-                    q_key = f"qty_qc_{idx}"
+                    q_key = f"qty_app_{idx}"
                     if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                     
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown("<div style='background:#f1f5f9; height:70px; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:10px; font-weight:700; margin-bottom:4px;'>🥜 HMB FRESH</div>", unsafe_allow_html=True)
-                            st.markdown("<div style='font-size:9px; color:#0284c7; font-weight:800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight:800; font-size:11px; height:28px; overflow:hidden;'>{prod['name']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color:#64748b; font-size:9px;'>{prod['description']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight:900; font-size:12px; margin:2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='background: #f1f5f9; height: 60px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 6px;'>📦 HMB FRESH</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='color: #0284c7; font-size: 9px; font-weight: 800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 800; font-size: 11px; height: 30px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color: #64748b; font-size: 9px; height: 18px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 900; font-size: 12px; color: #e11d48; margin: 4px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
                             
-                            # Clean Add button or quantity adjuster
-                            if st.button("ADD +", key=f"add_qc_{idx}", use_container_width=True):
+                            if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
                                 st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
                                 st.success("Added!")
                                 st.rerun()
     else:
-        st.info("No matching products found.")
+        st.info("No items found.")
 else:
-    st.subheader("🛒 Your Shopping Cart & Checkout")
+    st.markdown("### 🛒 Your Shopping Cart")
     if st.session_state.cart:
         for idx, item in enumerate(st.session_state.cart):
-            c1, c2 = st.columns([4, 1])
+            c1, c2 = st.columns([4, 1], gap="small")
             with c1: st.markdown(f"- **{item['product']}** ({item['quantity']})")
             with c2:
-                if st.button("Remove", key=f"rem_item_{idx}", use_container_width=True):
-                    st.session_state.cart.pop(idx); st.rerun()
+                if st.button("✕", key=f"rem_{idx}", use_container_width=True):
+                    st.session_state.cart.pop(idx)
+                    st.rerun()
         
         st.markdown("---")
-        with st.form("checkout_form"):
-            address = st.text_area("Delivery Address:")
-            sec_phone = "".join([c for c in st.text_input("Alternative Contact Number:", max_chars=10) if c.isdigit()])
-            desc = st.text_input("Special Instructions:")
-            if st.form_submit_button("Complete Order", use_container_width=True):
-                if address and len(sec_phone) == 10:
-                    st.success(process_order_submission(address, sec_phone, desc))
-                    st.session_state.current_view = "Home"
+        st.markdown("#### Delivery Checkout")
+        with st.form("mobile_checkout"):
+            address = st.text_area("Delivery Address (Thiruverkadu area):")
+            sec_phone = "".join([c for c in st.text_input("Alternate Phone (10 digits):", max_chars=10) if c.isdigit()])
+            desc = st.text_input("Special instructions (optional):")
+            if st.form_submit_button("Place Order Now", use_container_width=True):
+                if address.strip() and len(sec_phone) == 10:
+                    res_msg = process_order_submission(address, sec_phone, desc)
+                    st.success(res_msg)
+                    st.session_state.current_view = "Shop"
                     st.rerun()
                 else:
-                    st.warning("⚠️ Provide full delivery address and valid 10-digit alternate phone.")
+                    st.warning("Please provide a valid delivery address and 10-digit alternate phone number.")
     else:
-        st.info("Your cart is currently empty. Explore categories to add items!")
+        st.info("Your cart is empty. Go back to Shop to add items.")
