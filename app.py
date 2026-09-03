@@ -143,21 +143,19 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    def on_search_change():
-        st.session_state.search_query = st.session_state.search_input_box
-
+    # Direct widget value binding bypassing callback lag for instant clearing responsiveness
     search_query = st.text_input(
         "Search", 
         value=st.session_state.search_query, 
         placeholder="🔍 Search dry fruits, nuts, seeds...", 
-        key="search_input_box", 
-        on_change=on_search_change, 
         label_visibility="collapsed"
     )
     
-    # Keep session state updated immediately if text is cleared or typed
-    st.session_state.search_query = search_query
-    active_query = search_query.strip().lower()
+    if search_query != st.session_state.search_query:
+        st.session_state.search_query = search_query
+        st.rerun()
+
+    active_query = st.session_state.search_query.strip().lower()
 
     def get_matching_products(query, products):
         if not query:
