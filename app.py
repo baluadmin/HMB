@@ -72,7 +72,8 @@ if not product_records:
 
 all_categories = sorted(list(set([p['category'] for p in product_records if p['category']])))
 if not st.session_state.selected_category or st.session_state.selected_category not in all_categories:
-    if all_categories: st.session_state.selected_category = all_categories[0]
+    if all_categories:
+        st.session_state.selected_category = all_categories[0]
 
 # Search Bar
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
