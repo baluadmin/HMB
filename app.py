@@ -18,17 +18,17 @@ st.markdown("""
         
         .store-header {
             background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            padding: 6px 10px; border-radius: 8px; text-align: center; margin-bottom: 6px; border: 1px solid #fecdd3;
+            padding: 8px 12px; border-radius: 8px; text-align: center; margin-bottom: 8px; border: 1px solid #fecdd3;
         }
-        .store-title { font-size: 14px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
-        .store-subtitle { font-size: 9px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 1px 0 0 0; }
+        .store-title { font-size: 15px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
+        .store-subtitle { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 2px 0 0 0; }
 
-        /* Quick-commerce style add button */
+        /* Quick-commerce button style */
         div.stButton > button {
             background: #ffffff !important;
-            color: #e11d48 !important; border: 1px solid #e11d48 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
+            color: #0284c7 !important; border: 1px solid #bae6fd !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
-        div.stButton > button:hover { background: #fff1f2 !important; }
+        div.stButton > button:hover { background: #f0f9ff !important; }
 
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 2rem; width: 100%; }
         .login-card { width: 100%; max-width: 360px; padding: 14px; border-radius: 10px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -86,7 +86,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Single line header for user info and navigation actions
+# Compact single line header bar
 user_col, b1, b2, b3 = st.columns([1.1, 0.8, 0.9, 0.8], gap="small")
 with user_col: st.markdown(f"👤 <span style='font-size:9px; font-weight:700;'>{st.session_state.logged_in_user}</span>", unsafe_allow_html=True)
 with b1:
@@ -149,51 +149,55 @@ def process_order_submission(address, secondary_phone, description):
     return f"Order placed successfully for: {cart_summary}!"
 
 if st.session_state.current_view == "Home":
-    st.markdown("##### 📂 Browse Categories")
+    # Blinkit style search input bar at the top
+    search_query = st.text_input("Search for items...", placeholder="🔍 Search for 'Almonds', 'Cashew'...", label_visibility="collapsed")
+
+    # Category Pill Filter Buttons (like Zepto/Blinkit category bubbles)
     if all_categories:
-        selected_cat = st.selectbox("Select Category", all_categories, index=all_categories.index(st.session_state.selected_category) if st.session_state.selected_category in all_categories else 0, label_visibility="collapsed")
-        if selected_cat != st.session_state.selected_category:
-            st.session_state.selected_category = selected_cat
-            st.rerun()
+        st.markdown("<div style='font-size:11px; font-weight:800; color:#334155; margin: 6px 0;'>EXPLORE CATEGORIES</div>", unsafe_allow_html=True)
+        cat_cols = st.columns(len(all_categories), gap="small")
+        for i, cat in enumerate(all_categories):
+            with cat_cols[i]:
+                if st.button(cat, key=f"pill_{cat}", use_container_width=True):
+                    st.session_state.selected_category = cat
+                    st.rerun()
 
     st.markdown("---")
     current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
-    st.markdown(f"##### 🛒 Products in {current_cat}")
-    filtered_products = [p for p in product_records if p['category'] == current_cat]
+    st.markdown(f"##### 📦 {current_cat} Special")
+    
+    # Filter products by search query or selected category
+    if search_query.strip():
+        filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
+    else:
+        filtered_products = [p for p in product_records if p['category'] == current_cat]
     
     if filtered_products:
-        # Display products in a 2-column grid layout like quick-commerce apps
+        # Quick-commerce 2-column grid layout with clean cards and ADD buttons
         for i in range(0, len(filtered_products), 2):
             cols = st.columns(2, gap="small")
             for j in range(2):
                 if i + j < len(filtered_products):
                     prod = filtered_products[i + j]
                     idx = i + j
-                    q_key = f"qty_{current_cat}_{idx}"
+                    q_key = f"qty_qc_{idx}"
                     if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                     
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown(f"<div style='font-weight:800; font-size:12px; height:32px; overflow:hidden;'>{prod['name']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color:#64748b; font-size:10px;'>{prod['description']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color:#e11d48; font-weight:900; font-size:13px; margin:4px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='background:#f1f5f9; height:70px; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#94a3b8; font-size:10px; font-weight:700; margin-bottom:4px;'>🥜 HMB FRESH</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='font-size:9px; color:#0284c7; font-weight:800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight:800; font-size:11px; height:28px; overflow:hidden;'>{prod['name']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color:#64748b; font-size:9px;'>{prod['description']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight:900; font-size:12px; margin:2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
                             
-                            q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
-                            with q_m:
-                                if st.button("-", key=f"minus_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
-                                    st.session_state.quantities[q_key] -= 1; st.rerun()
-                            with q_d: 
-                                st.markdown(f"<div style='text-align:center; font-weight:900; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
-                            with q_p:
-                                if st.button("+", key=f"plus_{q_key}", use_container_width=True):
-                                    st.session_state.quantities[q_key] += 1; st.rerun()
-                            
-                            if st.button("ADD", key=f"add_cart_{q_key}", use_container_width=True):
-                                st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
+                            # Clean Add button or quantity adjuster
+                            if st.button("ADD +", key=f"add_qc_{idx}", use_container_width=True):
+                                st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
                                 st.success("Added!")
                                 st.rerun()
     else:
-        st.info("No items found under this category in your spreadsheet.")
+        st.info("No matching products found.")
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
     if st.session_state.cart:
