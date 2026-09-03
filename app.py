@@ -117,9 +117,6 @@ if st.session_state.current_view == "Cart":
                     encoded_message = urllib.parse.quote(wa_message)
                     wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
                     
-                    st.success("Order processed successfully! Tap below to open WhatsApp:")
-                    
-                    # Direct external tab anchor to prevent framing blocks
                     st.markdown(f"""
                         <a href="{wa_link}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                             <div style="background: #22c55e; color: white; text-align: center; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 12px; width: 100%; margin-top: 8px; cursor: pointer;">
