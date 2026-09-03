@@ -30,7 +30,7 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky top header and search bar container for stable scrolling */
+        /* Sticky top header and search bar container */
         .sticky-header {
             position: sticky;
             top: 0;
@@ -40,11 +40,17 @@ st.markdown("""
             padding-bottom: 4px;
         }
 
-        /* Scrollable product catalog viewport wrapper */
-        .scrollable-catalog {
-            max-height: 72vh;
-            overflow-y: auto;
-            padding-right: 2px;
+        /* Clean dedicated scrollable view box for products */
+        .product-scroll-container {
+            height: 62vh;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 4px;
+            margin-top: 4px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 8px 4px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -236,8 +242,8 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Scrollable container wrapper for products catalog
-    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
+    # Dedicated scrollable viewport container for the product catalog
+    st.markdown('<div class="product-scroll-container">', unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -276,4 +282,4 @@ else:
     else:
         st.info("No items found.")
 
-    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
+    st.markdown('</div>', unsafe_allow_html=True) # End product-scroll-container div
