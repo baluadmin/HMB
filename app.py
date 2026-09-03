@@ -88,19 +88,52 @@ def handle_search_update():
 
 search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input_field", on_change=handle_search_update, label_visibility="collapsed")
 
-active_query = st.session_state.search_input_field.strip()
+active_query = st.session_state.search_input_field.strip().lower()
 
-# Dropdown suggestion list matching Zepto/Blinkit search style with product thumbnail previews on the left
-matching_products = []
+# Flexible substring and character match search algorithm to handle typos/partial queries
+def get_matching_products(query, products):
+    if not query:
+        return products
+    
+    exact_matches = []
+    partial_matches = []
+    fuzzy_matches = []
+    
+    for p in products:
+        name_lower = p['name'].lower()
+        cat_lower = p['category'].lower()
+        
+        if query in name_lower or query in cat_lower:
+            exact_matches.append(p)
+        else:
+            # Handle minor typos by checking if most characters or words overlap
+            query_chars = set(query)
+            name_chars = set(name_lower)
+            common_chars = query_chars.intersection(name_chars)
+            if len(common_chars) >= max(1, len(query_chars) - 2):
+                fuzzy_matches.append(p)
+                
+    # Combine results, ensuring unique products
+    seen_ids = set()
+    final_list = []
+    for p in exact_matches + fuzzy_matches:
+        if p['id'] not in seen_ids:
+            seen_ids.add(p['id'])
+            final_list.append(p)
+            
+    return final_list
+
+# Dropdown suggestion list for partial/misspelled inputs
+matching_suggestions = []
 if active_query:
-    matching_products = [p for p in product_records if active_query.lower() in p['name'].lower()]
+    matching_suggestions = get_matching_products(active_query, product_records)
 
-if matching_products and active_query.lower() != matching_products[0]['name'].lower():
+if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
     st.markdown("""
         <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
     """, unsafe_allow_html=True)
     
-    for idx, prod in enumerate(matching_products[:6]):
+    for idx, prod in enumerate(matching_suggestions[:6]):
         sug_col1, sug_col2 = st.columns([1, 5], gap="small")
         with sug_col1:
             st.markdown("""
@@ -116,11 +149,11 @@ if matching_products and active_query.lower() != matching_products[0]['name'].lo
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-# Filter catalog products or default to full menu instantly when search box is empty
+# Filter products or show default inventory instantly if cleared
 if not active_query:
     filtered_products = product_records
 else:
-    filtered_products = [p for p in product_records if active_query.lower() in p['name'].lower() or active_query.lower() in p['category'].lower()]
+    filtered_products = get_matching_products(active_query, product_records)
 
 if filtered_products:
     for i in range(0, len(filtered_products), 2):
