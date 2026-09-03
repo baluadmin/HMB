@@ -23,15 +23,6 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #fff1f2 !important; }
 
-        /* Quick-commerce style floating add button override for cards */
-        .card-add-btn button {
-            background: #ffffff !important;
-            color: #2563eb !important;
-            border: 1px solid #bfdbfe !important;
-            border-radius: 8px !important;
-            font-weight: 900 !important;
-        }
-
         .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 """, unsafe_allow_html=True)
@@ -180,9 +171,13 @@ if st.session_state.current_view == "Shop":
                     q_key = f"qty_app_{idx}"
                     if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                     
+                    # Safe price parsing
+                    raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
+                    base_price = float(raw_price_str) if raw_price_str else 0.0
+                    mrp_price = int(base_price * 1.1)
+                    
                     with cols[j]:
                         with st.container(border=True):
-                            # Zepto/Blinkit style card layout matching reference image
                             st.markdown(
                                 f"""
                                 <div style="background: #ffffff; border-radius: 8px;">
@@ -193,7 +188,7 @@ if st.session_state.current_view == "Shop":
                                     <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
                                     <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{prod['price']} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{int(float(prod['price'])*1.1)}</span></div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
