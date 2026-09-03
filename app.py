@@ -8,17 +8,17 @@ import streamlit as st
 st.set_page_config(page_title="HMB Nuts and Seeds", page_icon="🥜", layout="wide")
 
 st.markdown("""
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=1200">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 13px !important; }
-        .stApp { background-color: #fff5f8 !important; }
-        .block-container { padding: 0.2rem 0.3rem !important; max-width: 100% !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 13px !important; min-width: 1200px !important; }
+        .stApp { background-color: #fff5f8 !important; min-width: 1200px !important; }
+        .block-container { padding: 0.2rem 0.3rem !important; max-width: 100% !important; min-width: 1200px !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
         
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
-            padding: 4px 6px; border-radius: 6px; text-align: center; margin-bottom: 2px; border: 1px solid #fbcfe8;
+            padding: 4px 6px; border-radius: 6px; text-align: center; margin-bottom: 2px; border: 1px solid #fbcfe8; width: 100%; box-sizing: border-box;
         }
         .brand-banner .brand-title { font-size: 16px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
         .brand-banner .brand-phone { font-size: 11px !important; font-weight: 800 !important; color: #9d174d !important; margin: 0; }
@@ -121,7 +121,7 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    col_menu, col_items = st.columns([1, 2.2], gap="small")
+    col_menu, col_items = st.columns([1, 2.5], gap="small")
     
     with col_menu:
         st.markdown("##### Categories")
@@ -141,10 +141,10 @@ if st.session_state.current_view == "Home":
                 if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                 
                 with st.container(border=True):
-                    ic1, ic2 = st.columns([2, 1.3], gap="small")
-                    with ic1:
-                        st.markdown(f"**{prod['name']}**<br><span style='color:#e11d48;'>₹{prod['price']}</span>", unsafe_allow_html=True)
-                    with ic2:
+                    pc1, pc2 = st.columns([3, 1], gap="small")
+                    with pc1:
+                        st.markdown(f"**{prod['name']}**<br><span style='color:#64748b;'>₹{prod['price']}</span>", unsafe_allow_html=True)
+                    with pc2:
                         q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
                         with q_m:
                             if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
