@@ -14,7 +14,6 @@ st.markdown("""
         .block-container { padding-top: 1.2rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
 
-        /* Custom single-line container styling for Shop, Cart, Logout */
         .nav-container { display: flex; gap: 6px; width: 100%; margin-bottom: 8px; }
         .nav-container > div { flex: 1; }
 
@@ -23,6 +22,15 @@ st.markdown("""
             color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 6px 2px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #fff1f2 !important; }
+
+        /* Quick-commerce style floating add button override for cards */
+        .card-add-btn button {
+            background: #ffffff !important;
+            color: #2563eb !important;
+            border: 1px solid #bfdbfe !important;
+            border-radius: 8px !important;
+            font-weight: 900 !important;
+        }
 
         .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
@@ -70,7 +78,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Forced single-line flex container for top navigation buttons
+# Single-line flex container for top navigation buttons
 st.markdown('<div class="nav-container">', unsafe_allow_html=True)
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
@@ -110,15 +118,15 @@ if not inv_df.empty:
             product_records.append({
                 "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]).strip(),
                 "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
-                "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "",
+                "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "1 Pack",
                 "image": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
             })
 
 if not product_records:
     product_records = [
-        {"id": "ITM001", "name": "Premium California Almonds", "price": "850", "stock": "50", "category": "Nuts", "image": "", "description": "Fresh and crunchy"},
-        {"id": "ITM002", "name": "W320 Cashew Nuts", "price": "900", "stock": "40", "category": "Nuts", "image": "", "description": "Whole premium cashews"},
-        {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "High in antioxidants"}
+        {"id": "ITM001", "name": "Premium California Almonds", "price": "850", "stock": "50", "category": "Nuts", "image": "", "description": "500g"},
+        {"id": "ITM002", "name": "W320 Cashew Nuts", "price": "900", "stock": "40", "category": "Nuts", "image": "", "description": "500g"},
+        {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "250g"}
     ]
 
 all_categories = sorted(list(set([p['category'] for p in product_records if p['category']])))
@@ -152,15 +160,15 @@ if st.session_state.current_view == "Shop":
                     st.session_state.selected_category = cat
                     st.rerun()
 
-    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
     current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
     
     if search_query.strip():
         filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
-        st.markdown(f"<p style='font-size: 10px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
     else:
         filtered_products = [p for p in product_records if p['category'] == current_cat]
-        st.markdown(f"<p style='font-size: 10px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -174,11 +182,22 @@ if st.session_state.current_view == "Shop":
                     
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown("<div style='background: #f1f5f9; height: 35px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 2px;'>📦 FRESH</div>", unsafe_allow_html=True)
-                            st.markdown("<div style='color: #0284c7; font-size: 8px; font-weight: 800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 800; font-size: 10px; height: 24px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color: #64748b; font-size: 8px; height: 14px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 900; font-size: 11px; color: #e11d48; margin: 2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            # Zepto/Blinkit style card layout matching reference image
+                            st.markdown(
+                                f"""
+                                <div style="background: #ffffff; border-radius: 8px;">
+                                    <div style="position: relative; background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
+                                        📦 PRODUCT IMG
+                                    </div>
+                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
+                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
+                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
+                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{prod['price']} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{int(float(prod['price'])*1.1)}</span></div>
+                                </div>
+                                """, 
+                                unsafe_allow_html=True
+                            )
                             
                             if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
                                 st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
