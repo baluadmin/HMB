@@ -13,6 +13,11 @@ st.set_page_config(
     layout="wide",
 )
 
+# Inject mobile viewport meta tag to prevent zooming and force full mobile layout scaling
+st.markdown("""
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+""", unsafe_allow_html=True)
+
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
