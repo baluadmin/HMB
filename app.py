@@ -11,7 +11,8 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
-        .block-container { padding: 0.3rem 0.5rem !important; max-width: 480px !important; margin: auto; }
+        /* Force container right to the top (within 2cm) */
+        .block-container { padding-top: 2px !important; padding-bottom: 0.4rem !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
         
         .compact-header {
@@ -26,7 +27,7 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #fff1f2 !important; }
 
-        .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 30px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -72,7 +73,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Compact Top Bar with Shop Name and User Info
+# Compact Top Bar pushed straight to the top
 st.markdown(f"""
     <div class="compact-header">
         <div>
