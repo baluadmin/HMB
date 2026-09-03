@@ -79,19 +79,18 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search Bar with dynamic text handling using session state
-if "search_query" not in st.session_state:
-    st.session_state.search_query = ""
+# Search Bar with immediate state rerunning on change
+def handle_search_change():
+    st.session_state.current_search = st.session_state.search_widget_input
 
-def update_search():
-    st.session_state.search_query = st.session_state.search_input
+if "current_search" not in st.session_state:
+    st.session_state.current_search = ""
 
-search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input", on_change=update_search, label_visibility="collapsed")
+search_query = st.text_input("Search", value=st.session_state.current_search, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_widget_input", on_change=handle_search_change, label_visibility="collapsed")
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-# Instantly revert to default full menu when search box is cleared
-active_query = st.session_state.search_query.strip()
+active_query = st.session_state.search_widget_input.strip()
 if not active_query:
     filtered_products = product_records
 else:
