@@ -41,8 +41,6 @@ if "search_query" not in st.session_state:
     st.session_state.search_query = ""
 if "current_view" not in st.session_state:
     st.session_state.current_view = "Shop"
-if "last_order_wa_link" not in st.session_state:
-    st.session_state.last_order_wa_link = ""
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -115,28 +113,22 @@ if st.session_state.current_view == "Cart":
                 if delivery_address.strip() and alt_contact.strip():
                     cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
                     
-                    # Construct WhatsApp Message & URL directed to your mobile number
                     wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
-                    st.session_state.last_order_wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
+                    wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
                     
                     st.success("Order processed successfully!")
+                    st.markdown(f"""
+                        <a href="{wa_link}" target="_blank">
+                            <button style="background: #22c55e; color: white; border: none; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; cursor: pointer; margin-top: 8px;">
+                                📲 Send Order to WhatsApp Now
+                            </button>
+                        </a>
+                    """, unsafe_allow_html=True)
+                    
                     st.session_state.cart = []
                 else:
                     st.warning("Please fill in both the delivery address and alternative contact number.")
-
-        if st.session_state.last_order_wa_link:
-            st.markdown(f"""
-                <a href="{st.session_state.last_order_wa_link}" target="_blank">
-                    <button style="background: #22c55e; color: white; border: none; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; cursor: pointer; margin-top: 8px;">
-                        📲 Send Order to WhatsApp Now
-                    </button>
-                </a>
-            """, unsafe_allow_html=True)
-            if st.button("Return to Shop", use_container_width=True):
-                st.session_state.last_order_wa_link = ""
-                st.session_state.current_view = "Shop"
-                st.rerun()
     else:
         st.info("Your cart is empty.")
         if st.button("Back to Shop", use_container_width=True):
@@ -144,7 +136,6 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Search Bar widget using session state safely without key collision
     search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
     if search_query != st.session_state.search_query:
         st.session_state.search_query = search_query
