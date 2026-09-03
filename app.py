@@ -77,20 +77,37 @@ with top_col2:
     if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
         st.info(f"Cart Items Count: {cart_count}")
 
-st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search Bar with immediate state rerunning on change
-def handle_search_change():
-    st.session_state.current_search = st.session_state.search_widget_input
+# Search state initialization
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
 
-if "current_search" not in st.session_state:
-    st.session_state.current_search = ""
+def handle_search_update():
+    st.session_state.search_query = st.session_state.search_input_field
 
-search_query = st.text_input("Search", value=st.session_state.current_search, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_widget_input", on_change=handle_search_change, label_visibility="collapsed")
+search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input_field", on_change=handle_search_update, label_visibility="collapsed")
+
+# Dynamic live suggestions matching typed text
+active_query = st.session_state.search_input_field.strip()
+matching_suggestions = []
+if active_query:
+    matching_suggestions = [p['name'] for p in product_records if active_query.lower() in p['name'].lower()]
+
+# Show clickable suggestion chips if typing and matches found
+if matching_suggestions and active_query.lower() != matching_suggestions[0].lower():
+    st.markdown("<p style='font-size: 10px; font-weight: 800; color: #64748b; margin: 2px 0;'>Suggestions:</p>", unsafe_allow_html=True)
+    sug_cols = st.columns(min(len(matching_suggestions), 3), gap="small")
+    for idx, suggestion in enumerate(matching_suggestions[:3]):
+        with sug_cols[idx]:
+            if st.button(suggestion, key=f"sug_{idx}", use_container_width=True):
+                st.session_state.search_query = suggestion
+                st.session_state.search_input_field = suggestion
+                st.rerun()
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-active_query = st.session_state.search_widget_input.strip()
+# Filter products based on query or show full default menu instantly if cleared
 if not active_query:
     filtered_products = product_records
 else:
