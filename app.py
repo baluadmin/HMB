@@ -87,16 +87,16 @@ st.markdown("""
             pointer-events: none !important;
         }
         
-        /* Enforce full-box filling and edge-to-edge cover sizing for all images */
+        /* Enforce image sizing to precisely match your reference layout */
         [data-testid="stImage"] {
             width: 100% !important;
             pointer-events: none !important;
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 70px !important;
+            height: 95px !important;
             object-fit: cover !important;
-            border-radius: 4px !important;
+            border-radius: 6px !important;
             pointer-events: none !important;
         }
         
@@ -171,7 +171,7 @@ st.markdown("""
             color: #0f172a !important;
         }
 
-        /* Force ALL horizontal blocks (including top nav and products layout) to remain side-by-side without wrapping */
+        /* Force side-by-side layout to never wrap or break */
         div[data-testid="stHorizontalBlock"] {
             display: flex !important;
             flex-direction: row !important;
@@ -467,12 +467,14 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- TWO-COLUMN LAYOUT MATCHING YOUR REFERENCE IMAGE ---
-    col_menu, col_items = st.columns([1, 2.3], gap="small")
+    # --- EXACT REFERENCE TWO-COLUMN LAYOUT ---
+    col_menu, col_items = st.columns([1.1, 2.4], gap="small")
 
     with col_menu:
         st.markdown("#### Menu")
         categories = list(set([p['category'] for p in product_records]))
+        
+        # Display all category buttons (acting as menu options matching reference image)
         for cat in categories:
             if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
                 st.session_state.selected_menu = cat
@@ -503,28 +505,50 @@ if st.session_state.current_view == "Home":
                     st.session_state.quantities[qty_key] = 1
 
                 with st.container(border=True):
-                    st.markdown(f"**{prod['name']}**")
-                    st.markdown(f"**₹{prod['price']}**")
+                    # Multi-column product layout matching reference image: Images / Details / Quantity & Add button
+                    p_img_col, p_info_col, p_qty_col = st.columns([2.2, 1.3, 1.3], gap="small")
                     
-                    q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
-                    with q_minus:
-                        if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
-                            if st.session_state.quantities[qty_key] > 1:
-                                st.session_state.quantities[qty_key] -= 1
+                    with p_img_col:
+                        raw_img = prod.get("image", "")
+                        if raw_img:
+                            img_paths = [img.strip() for img in raw_img.replace("\\", ",").split(",") if img.strip()]
+                            valid_paths = [p for p in img_paths if os.path.exists(p)]
+                        else:
+                            valid_paths = []
+                        
+                        # 3-image preview row matching reference
+                        icols = st.columns(3, gap="small")
+                        for i in range(3):
+                            with icols[i]:
+                                if i < len(valid_paths):
+                                    st.image(valid_paths[i], use_container_width=True)
+                                else:
+                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 10px;'>No Img</p>", unsafe_allow_html=True)
+
+                    with p_info_col:
+                        st.markdown(f"**{prod['name']}**")
+                        st.markdown(f"**₹{prod['price']}**")
+
+                    with p_qty_col:
+                        q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
+                        with q_minus:
+                            if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
+                                if st.session_state.quantities[qty_key] > 1:
+                                    st.session_state.quantities[qty_key] -= 1
+                                    st.rerun()
+                        with q_display:
+                            st.markdown(f"<div style='text-align: center; padding-top: 2px; font-weight: 800; font-size: 13px;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
+                        with q_plus:
+                            if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
+                                st.session_state.quantities[qty_key] += 1
                                 st.rerun()
-                    with q_display:
-                        st.markdown(f"<div style='text-align: center; padding-top: 4px; font-weight: 800;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
-                    with q_plus:
-                        if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
-                            st.session_state.quantities[qty_key] += 1
+                        
+                        if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
+                            qty_val = st.session_state.quantities[qty_key]
+                            full_q_str = f"{qty_val} Units"
+                            st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
+                            st.success(f"Added!")
                             st.rerun()
-                    
-                    if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
-                        qty_val = st.session_state.quantities[qty_key]
-                        full_q_str = f"{qty_val} Units"
-                        st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
-                        st.success(f"Added!")
-                        st.rerun()
             
             # Pagination Controls at the bottom
             if total_pages > 1:
