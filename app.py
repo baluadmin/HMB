@@ -25,7 +25,7 @@ st.markdown("""
 
         div.stButton > button, div[data-testid="stFormSubmitButton"] > button {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%) !important;
-            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; width: 100% !important; padding: 4px !important;
+            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; width: 100% !important; padding: 6px !important;
         }
 
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 1rem; width: 100%; }
@@ -121,19 +121,22 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    # Exact 30:70 horizontal split for categories (30%) and products (70%)
-    col_menu, col_items = st.columns([0.3, 0.7], gap="small")
+    # Using separate tabs for Categories and Products to ensure perfect mobile layout without squishing
+    cat_tab, prod_tab = st.tabs(["📂 Categories", "🥜 Products"])
     
-    with col_menu:
-        st.markdown("##### Categories")
-        for cat in sorted(list(set([p['category'] for p in product_records]))):
-            if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
+    all_categories = sorted(list(set([p['category'] for p in product_records])))
+    
+    with cat_tab:
+        st.markdown("##### Select Category")
+        for cat in all_categories:
+            if st.button(f"👉 {cat}", key=f"cat_tab_btn_{cat}", use_container_width=True):
                 st.session_state.selected_menu = cat
+                st.success(f"Selected: {cat}. Switch to Products tab!")
                 st.rerun()
 
-    with col_items:
+    with prod_tab:
         current_cat = st.session_state.get("selected_menu", "Nuts")
-        st.markdown(f"##### {current_cat}")
+        st.markdown(f"##### Products in: {current_cat}")
         filtered = [p for p in product_records if p['category'] == current_cat]
         
         if filtered:
@@ -150,7 +153,7 @@ if st.session_state.current_view == "Home":
                         with q_m:
                             if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
                                 st.session_state.quantities[q_key] -= 1; st.rerun()
-                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:4px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
                         with q_p:
                             if st.button("+", key=f"p_{q_key}", use_container_width=True):
                                 st.session_state.quantities[q_key] += 1; st.rerun()
@@ -160,7 +163,7 @@ if st.session_state.current_view == "Home":
                         st.success("Added!")
                         st.rerun()
         else:
-            st.info("No items found.")
+            st.info("No items found in this category.")
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
     if st.session_state.cart:
