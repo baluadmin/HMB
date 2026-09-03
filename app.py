@@ -16,9 +16,9 @@ st.markdown("""
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 6px 2px !important; min-height: unset !important; width: 100% !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
-        div.stButton > button:hover { background: #fff1f2 !important; }
+        div.stButton > button:hover { background: #f0f9ff !important; }
 
         .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 10px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
@@ -33,8 +33,6 @@ if "user_phone" not in st.session_state:
     st.session_state.user_phone = None
 if "cart" not in st.session_state:
     st.session_state.cart = []
-if "current_view" not in st.session_state:
-    st.session_state.current_view = "Shop"
 if "selected_category" not in st.session_state:
     st.session_state.selected_category = ""
 if "quantities" not in st.session_state:
@@ -101,21 +99,6 @@ all_categories = sorted(list(set([p['category'] for p in product_records if p['c
 if not st.session_state.selected_category or st.session_state.selected_category not in all_categories:
     if all_categories: st.session_state.selected_category = all_categories[0]
 
-def process_order_submission(address, secondary_phone, description):
-    if not st.session_state.cart: return "Cart is empty."
-    cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
-    if NEW_GOOGLE_SCRIPT_URL:
-        try:
-            requests.post(NEW_GOOGLE_SCRIPT_URL, json={
-                "Type": "Order", "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "Customer_Name": st.session_state.logged_in_user, "Primary_Phone": st.session_state.user_phone,
-                "Items": cart_summary, "Address": address, "Secondary_Phone": secondary_phone, "Description": description
-            })
-        except Exception:
-            pass
-    st.session_state.cart = []
-    return f"Order placed successfully for: {cart_summary}!"
-
 search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
 if all_categories:
@@ -138,6 +121,7 @@ else:
     st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
 
 if filtered_products:
+    # Explicitly renders exactly 2 products side by side in every row for mobile screens
     for i in range(0, len(filtered_products), 2):
         cols = st.columns(2, gap="small")
         for j in range(2):
@@ -154,7 +138,7 @@ if filtered_products:
                         st.markdown(
                             f"""
                             <div style="background: #ffffff; border-radius: 8px;">
-                                <div style="position: relative; background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
+                                <div style="position: relative; background: #f1f5f9; height: 100px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
                                     📦 PRODUCT IMG
                                 </div>
                                 <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
