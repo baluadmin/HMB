@@ -37,8 +37,8 @@ st.markdown("""
         .block-container {
             padding-top: 0.5rem !important;
             padding-bottom: 0rem !important;
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
             max-width: 100% !important;
             overflow-x: hidden !important;
         }
@@ -104,17 +104,18 @@ st.markdown("""
         label, .stTextInput label, p, span, div[data-testid="stMarkdownContainer"] p {
             color: #0f172a !important;
             font-weight: 700 !important;
-            font-size: 16px !important;
+            font-size: 15px !important;
         }
         
-        /* Input boxes styling with explicit light mode colors */
+        /* Input boxes styling with explicit light mode colors and comfortable padding */
         input, textarea, div[data-baseweb="select"] > div {
             background-color: #ffffff !important;
             color: #0f172a !important;
             border: 2px solid #cbd5e1 !important;
-            font-size: 18px !important;
+            font-size: 16px !important;
             font-weight: 700 !important;
-            border-radius: 12px !important;
+            border-radius: 10px !important;
+            box-sizing: border-box !important;
         }
         input:focus, textarea:focus {
             border-color: #f472b6 !important;
@@ -136,7 +137,7 @@ st.markdown("""
         }
         .brand-banner .brand-title {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 26px !important;
+            font-size: 24px !important;
             font-weight: 900 !important;
             letter-spacing: 0.5px;
             color: #831843 !important;
@@ -144,7 +145,7 @@ st.markdown("""
             text-transform: lowercase;
         }
         .brand-banner .brand-phone {
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 800 !important;
             letter-spacing: 0.5px;
             color: #9d174d !important;
@@ -176,40 +177,18 @@ st.markdown("""
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            padding-top: 1rem;
+            justify-content: center;
+            padding-top: 1.5rem;
             width: 100%;
             box-sizing: border-box;
         }
 
-        @media (max-width: 900px) {
-            .stMainBlockContainer div[data-testid="stHorizontalBlock"]:first-of-type {
-                flex-direction: row !important;
-                flex-wrap: nowrap !important;
-            }
-            .stMainBlockContainer div[data-testid="stHorizontalBlock"]:first-of-type > div[data-testid="column"] {
-                width: auto !important;
-                flex: 1 1 auto !important;
-                min-width: 0px !important;
-                padding: 0px 2px !important;
-            }
-
-            div[data-testid="stHorizontalBlock"]:not(:first-of-type) {
-                flex-direction: column !important;
-                flex-wrap: wrap !important;
-            }
-            div[data-testid="stHorizontalBlock"]:not(:first-of-type) > div[data-testid="column"] {
-                width: 100% !important;
-                flex: 1 1 100% !important;
-                min-width: 100% !important;
-                padding: 4px 0px !important;
-            }
-        }
-
         .login-title {
             text-align: center;
-            margin: 5px 0 10px 0;
+            margin: 5px 0 15px 0;
             width: 100%;
+            padding: 0 10px;
+            box-sizing: border-box;
         }
 
         .login-title h1 {
@@ -222,17 +201,24 @@ st.markdown("""
         }
 
         .login-title p {
-            font-size: 14px !important;
+            font-size: 13px !important;
             color: #64748b !important;
             margin: 0;
         }
 
+        /* Centered compact mobile-friendly card container */
+        .login-card-container {
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
         .login-card {
             width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 18px;
+            border-radius: 14px;
             background-color: #ffffff !important;
             border: 2px solid #fbcfe8 !important;
             box-shadow: 0 10px 25px -5px rgba(251, 207, 232, 0.3);
@@ -241,7 +227,7 @@ st.markdown("""
         }
 
         .login-card h3 {
-            margin: 0 0 10px 0;
+            margin: 0 0 12px 0;
             font-size: 20px !important;
             font-weight: 800 !important;
             color: #1e293b !important;
@@ -301,47 +287,46 @@ if not st.session_state.logged_in_user:
         </div>
     """, unsafe_allow_html=True)
 
-    _, login_col, _ = st.columns([0.1, 2.8, 0.1])
+    st.markdown('<div class="login-card-container">', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="login-card">
+            <h3>Customer Portal Login</h3>
+        </div>
+    """, unsafe_allow_html=True)
 
-    with login_col:
-        st.markdown("""
-            <div class="login-card">
-                <h3>Customer Portal Login</h3>
-            </div>
-        """, unsafe_allow_html=True)
+    with st.form("customer_direct_login_center", clear_on_submit=False):
+        cust_name = st.text_input("Your Name:")
+        
+        # Raw string input for mobile number to filter out non-digits automatically
+        raw_phone = st.text_input("Mobile Number:", max_chars=10)
+        cust_phone = "".join([char for char in raw_phone if char.isdigit()])
 
-        with st.form("customer_direct_login_center", clear_on_submit=False):
-            cust_name = st.text_input("Your Name:")
-            
-            # Raw string input for mobile number to filter out non-digits automatically
-            raw_phone = st.text_input("Mobile Number:", max_chars=10)
-            cust_phone = "".join([char for char in raw_phone if char.isdigit()])
+        login_btn = st.form_submit_button(
+            "Secure Login",
+            use_container_width=True
+        )
 
-            login_btn = st.form_submit_button(
-                "Secure Login",
-                use_container_width=True
-            )
+        if login_btn:
+            if cust_name.strip() and len(cust_phone) == 10:
+                st.session_state.logged_in_user = cust_name.strip()
+                st.session_state.user_phone = cust_phone.strip()
+                st.session_state.user_role = "Customer"
+                st.session_state.selected_menu = "Nuts"
+                st.session_state.product_page = 0
 
-            if login_btn:
-                if cust_name.strip() and len(cust_phone) == 10:
-                    st.session_state.logged_in_user = cust_name.strip()
-                    st.session_state.user_phone = cust_phone.strip()
-                    st.session_state.user_role = "Customer"
-                    st.session_state.selected_menu = "Nuts"
-                    st.session_state.product_page = 0
+                log_login_to_sheet(
+                    cust_name.strip(),
+                    cust_phone.strip()
+                )
 
-                    log_login_to_sheet(
-                        cust_name.strip(),
-                        cust_phone.strip()
-                    )
+                st.success("✅ Login Successful!")
+                st.rerun()
+            else:
+                st.warning(
+                    "⚠️ Please provide a valid name and exact 10-digit numeric mobile number."
+                )
 
-                    st.success("✅ Login Successful!")
-                    st.rerun()
-                else:
-                    st.warning(
-                        "⚠️ Please provide a valid name and exact 10-digit numeric mobile number."
-                    )
-
+    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     st.stop()
 
