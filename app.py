@@ -22,7 +22,7 @@ st.markdown("""
         /* Lock screen width to prevent horizontal overflow or scrolling */
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 16px !important;
+            font-size: 15px !important;
             max-width: 100vw !important;
             overflow-x: hidden !important;
         }
@@ -35,10 +35,10 @@ st.markdown("""
 
         /* Restrict main container margins so everything aligns safely on mobile screens */
         .block-container {
-            padding-top: 0.5rem !important;
+            padding-top: 0.4rem !important;
             padding-bottom: 0rem !important;
-            padding-left: 0.8rem !important;
-            padding-right: 0.8rem !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
             max-width: 100% !important;
             overflow-x: hidden !important;
         }
@@ -94,9 +94,9 @@ st.markdown("""
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 100px !important;
+            height: 80px !important;
             object-fit: cover !important;
-            border-radius: 8px !important;
+            border-radius: 6px !important;
             pointer-events: none !important;
         }
         
@@ -107,7 +107,7 @@ st.markdown("""
             font-size: 15px !important;
         }
         
-        /* Input boxes styling with explicit light mode colors and comfortable padding */
+        /* Input boxes styling with explicit light mode colors */
         input, textarea, div[data-baseweb="select"] > div {
             background-color: #ffffff !important;
             color: #0f172a !important;
@@ -125,19 +125,19 @@ st.markdown("""
         /* Soft Light Pink Gradient Header Banner */
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 10px;
             color: #831843 !important;
             text-align: center;
             box-shadow: 0 3px 10px -2px rgba(251, 207, 232, 0.3);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             border: 1px solid #fbcfe8;
             width: 100%;
             box-sizing: border-box;
         }
         .brand-banner .brand-title {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 24px !important;
+            font-size: 22px !important;
             font-weight: 900 !important;
             letter-spacing: 0.5px;
             color: #831843 !important;
@@ -145,7 +145,7 @@ st.markdown("""
             text-transform: lowercase;
         }
         .brand-banner .brand-phone {
-            font-size: 14px !important;
+            font-size: 13px !important;
             font-weight: 800 !important;
             letter-spacing: 0.5px;
             color: #9d174d !important;
@@ -158,18 +158,18 @@ st.markdown("""
             color: #0f172a !important;
             border: 1px solid #f472b6 !important;
             font-weight: 800 !important;
-            font-size: 16px !important;
-            border-radius: 10px !important;
-            padding: 0.5rem 0.6rem !important;
+            font-size: 15px !important;
+            border-radius: 8px !important;
+            padding: 0.4rem 0.5rem !important;
             width: 100% !important;
             display: block !important;
-            box-shadow: 0 4px 12px rgba(251, 207, 232, 0.4) !important;
+            box-shadow: 0 3px 10px rgba(251, 207, 232, 0.4) !important;
             transition: all 0.2s ease-in-out;
         }
         div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover {
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%) !important;
             color: #0f172a !important;
-            box-shadow: 0 6px 15px rgba(244, 114, 182, 0.5) !important;
+            box-shadow: 0 5px 12px rgba(244, 114, 182, 0.5) !important;
         }
 
         /* Fully responsive login wrapper centered perfectly */
@@ -183,6 +183,20 @@ st.markdown("""
             box-sizing: border-box;
         }
 
+        /* Force mobile layout stacking for columns */
+        @media (max-width: 768px) {
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                flex-wrap: wrap !important;
+            }
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+                padding: 4px 0px !important;
+            }
+        }
+
         .login-title {
             text-align: center;
             margin: 5px 0 15px 0;
@@ -193,7 +207,7 @@ st.markdown("""
 
         .login-title h1 {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 28px !important;
+            font-size: 26px !important;
             font-weight: 900 !important;
             margin: 0 0 5px 0;
             color: #0f172a !important;
@@ -206,10 +220,9 @@ st.markdown("""
             margin: 0;
         }
 
-        /* Centered compact mobile-friendly card container */
         .login-card-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             margin: 0 auto;
             padding: 0 10px;
             box-sizing: border-box;
@@ -217,8 +230,8 @@ st.markdown("""
 
         .login-card {
             width: 100%;
-            padding: 18px;
-            border-radius: 14px;
+            padding: 15px;
+            border-radius: 12px;
             background-color: #ffffff !important;
             border: 2px solid #fbcfe8 !important;
             box-shadow: 0 10px 25px -5px rgba(251, 207, 232, 0.3);
@@ -227,8 +240,8 @@ st.markdown("""
         }
 
         .login-card h3 {
-            margin: 0 0 12px 0;
-            font-size: 20px !important;
+            margin: 0 0 10px 0;
+            font-size: 18px !important;
             font-weight: 800 !important;
             color: #1e293b !important;
         }
@@ -339,10 +352,10 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Adjusted column ratios to ensure Home, Cart, and Logout fit neatly in a single horizontal row without wrapping
-top_comm, top_space, top_c1, top_c2, top_c3 = st.columns([2.2, 0.4, 1.3, 1.3, 1.3], gap="small")
+# Navigation row
+top_comm, top_space, top_c1, top_c2, top_c3 = st.columns([2, 0.2, 1, 1, 1], gap="small")
 with top_comm:
-    st.markdown(f"👋 Welcome, **{st.session_state.logged_in_user}**!")
+    st.markdown(f"👋 **{st.session_state.logged_in_user}**")
 with top_space:
     st.empty()
 with top_c1:
@@ -351,7 +364,7 @@ with top_c1:
         st.rerun()
 with top_c2:
     cart_count = len(st.session_state.cart)
-    if st.button(f"Cart ({cart_count})", use_container_width=True):
+    if st.button(f"Cart({cart_count})", use_container_width=True):
         st.session_state.current_view = "Cart"
         st.rerun()
 with top_c3:
@@ -461,91 +474,58 @@ if st.session_state.current_view == "Home":
 
     # --- SECTION 1: MENU ---
     with col_menu:
-        st.markdown("Menu")
-        with st.container(height=2400, border=True):
-            categories = list(set([p['category'] for p in product_records]))
-            for cat in categories:
-                if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
-                    st.session_state.selected_menu = cat
-                    st.session_state.product_page = 0
-                    st.rerun()
+        st.markdown("### Menu")
+        categories = list(set([p['category'] for p in product_records]))
+        for cat in categories:
+            if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
+                st.session_state.selected_menu = cat
+                st.session_state.product_page = 0
+                st.rerun()
 
     # --- SECTION 2: ITEMS ---
     with col_items:
         current_cat = st.session_state.get("selected_menu", "Nuts")
-        st.markdown(f"{current_cat}")
-        with st.container(height=2400, border=True):
-            filtered_items = [p for p in product_records if p['category'] == current_cat]
+        st.markdown(f"### {current_cat}")
+        filtered_items = [p for p in product_records if p['category'] == current_cat]
+        
+        if filtered_items:
+            items_per_page = 10
+            total_items = len(filtered_items)
+            total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
             
-            if filtered_items:
-                items_per_page = 18
-                total_items = len(filtered_items)
-                total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
-                
-                if st.session_state.product_page >= total_pages:
-                    st.session_state.product_page = 0
-                
-                start_idx = st.session_state.product_page * items_per_page
-                end_idx = min(start_idx + items_per_page, total_items)
-                current_page_items = filtered_items[start_idx:end_idx]
+            if st.session_state.product_page >= total_pages:
+                st.session_state.product_page = 0
+            
+            start_idx = st.session_state.product_page * items_per_page
+            end_idx = min(start_idx + items_per_page, total_items)
+            current_page_items = filtered_items[start_idx:end_idx]
 
-                for idx, prod in enumerate(current_page_items):
-                    global_idx = start_idx + idx
-                    qty_key = f"qty_val_{current_cat}_{global_idx}"
-                    if qty_key not in st.session_state.quantities:
-                        st.session_state.quantities[qty_key] = 1
+            for idx, prod in enumerate(current_page_items):
+                global_idx = start_idx + idx
+                qty_key = f"qty_val_{current_cat}_{global_idx}"
+                if qty_key not in st.session_state.quantities:
+                    st.session_state.quantities[qty_key] = 1
 
-                    p_imgs_col, p_div1_col, p_details_col = st.columns([5.2, 0.05, 1.8], gap="small")
+                with st.container(border=True):
+                    p_info_col, p_action_col = st.columns([2, 1], gap="small")
                     
-                    with p_imgs_col:
-                        raw_img = prod.get("image", "")
-                        if raw_img:
-                            img_paths = [img.strip() for img in raw_img.replace("\\", ",").split(",") if img.strip()]
-                            valid_paths = [p for p in img_paths if os.path.exists(p)]
-                        else:
-                            valid_paths = []
-                        
-                        # Row 1: 3 images
-                        img_cols_1 = st.columns(3, gap="small")
-                        for i in range(3):
-                            with img_cols_1[i]:
-                                if i < len(valid_paths):
-                                    st.image(valid_paths[i], use_container_width=True)
-                                else:
-                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>No Img</p>", unsafe_allow_html=True)
-                        
-                        # Row 2: 3 images
-                        img_cols_2 = st.columns(3, gap="small")
-                        for i in range(3, 6):
-                            with img_cols_2[i - 3]:
-                                if i < len(valid_paths):
-                                    st.image(valid_paths[i], use_container_width=True)
-                                else:
-                                    st.markdown("<p style='text-align: center; color: #94a3b8; font-size: 13px;'>No Img</p>", unsafe_allow_html=True)
-                            
-                    with p_div1_col:
-                        st.markdown("<div style='border-left: 2px solid #e2e8f0; height: 350px; margin-top: 1px;'></div>", unsafe_allow_html=True)
-
-                    with p_details_col:
-                        st.markdown("<div style='height: 1px;'></div>", unsafe_allow_html=True)
+                    with p_info_col:
                         st.markdown(f"**{prod['name']}**")
-                        st.markdown(f"₹{prod['price']}")
+                        st.markdown(f"Price: **₹{prod['price']}**")
                         
-                        # - / + Quantity Stepper Controls
-                        q_minus, q_display, q_plus = st.columns([1, 1.2, 1], gap="small")
+                    with p_action_col:
+                        q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
                         with q_minus:
                             if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
                                 if st.session_state.quantities[qty_key] > 1:
                                     st.session_state.quantities[qty_key] -= 1
                                     st.rerun()
                         with q_display:
-                            st.markdown(f"<div style='text-align: center; padding-top: 6px; font-weight: 800;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='text-align: center; padding-top: 4px; font-weight: 800;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
                         with q_plus:
                             if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
                                 st.session_state.quantities[qty_key] += 1
                                 st.rerun()
-                        
-                        st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
                         
                         if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
                             qty_val = st.session_state.quantities[qty_key]
@@ -553,26 +533,24 @@ if st.session_state.current_view == "Home":
                             st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
                             st.success(f"Added!")
                             st.rerun()
-                                    
-                    st.markdown("<hr style='margin-top: 4px; margin-bottom: 4px; border: none; border-top: 2px solid #e2e8f0;'>", unsafe_allow_html=True)
-                
-                # Pagination Controls at the bottom
-                if total_pages > 1:
-                    pg_prev, pg_info, pg_next = st.columns([1, 2, 1], gap="small")
-                    with pg_prev:
-                        if st.button("⬅ Prev", use_container_width=True):
-                            if st.session_state.product_page > 0:
-                                st.session_state.product_page -= 1
-                                st.rerun()
-                    with pg_info:
-                        st.markdown(f"<p style='text-align: center; margin-top: 2px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
-                    with pg_next:
-                        if st.button("Next ➡", use_container_width=True):
-                            if st.session_state.product_page < total_pages - 1:
-                                st.session_state.product_page += 1
-                                st.rerun()
-            else:
-                st.info("No items found.")
+            
+            # Pagination Controls at the bottom
+            if total_pages > 1:
+                pg_prev, pg_info, pg_next = st.columns([1, 2, 1], gap="small")
+                with pg_prev:
+                    if st.button("⬅ Prev", use_container_width=True):
+                        if st.session_state.product_page > 0:
+                            st.session_state.product_page -= 1
+                            st.rerun()
+                with pg_info:
+                    st.markdown(f"<p style='text-align: center; margin-top: 4px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
+                with pg_next:
+                    if st.button("Next ➡", use_container_width=True):
+                        if st.session_state.product_page < total_pages - 1:
+                            st.session_state.product_page += 1
+                            st.rerun()
+        else:
+            st.info("No items found.")
 
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
@@ -582,7 +560,7 @@ else:
             with cc1:
                 st.markdown(f"- **{item['product']}** ({item['quantity']})")
             with cc2:
-                if st.button("Remove Item", key=f"rem_cart_view_{c_idx}__"):
+                if st.button("Remove", key=f"rem_cart_view_{c_idx}__", use_container_width=True):
                     st.session_state.cart.pop(c_idx)
                     st.rerun()
         
@@ -596,7 +574,7 @@ else:
             
             product_desc = st.text_area("Product Specifications / Custom Description:")
             
-            submit_checkout = st.form_submit_button("Complete Order")
+            submit_checkout = st.form_submit_button("Complete Order", use_container_width=True)
             if submit_checkout:
                 if checkout_address and len(secondary_phone) == 10:
                     result_msg = process_cart_checkout(
