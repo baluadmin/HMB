@@ -143,14 +143,22 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Direct widget value binding bypassing callback lag for instant clearing responsiveness
+    def on_search_change():
+        # Captures changes or clearing immediately from the search widget
+        new_val = st.session_state.search_box_input
+        if new_val != st.session_state.search_query:
+            st.session_state.search_query = new_val
+
     search_query = st.text_input(
         "Search", 
         value=st.session_state.search_query, 
         placeholder="🔍 Search dry fruits, nuts, seeds...", 
+        key="search_box_input",
+        on_change=on_search_change,
         label_visibility="collapsed"
     )
     
+    # Fallback assignment to catch clearing via 'x' browser button or backspace deletion
     if search_query != st.session_state.search_query:
         st.session_state.search_query = search_query
         st.rerun()
