@@ -11,21 +11,21 @@ st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 11px !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 12px !important; }
         .stApp { background-color: #fff5f8 !important; }
-        .block-container { padding: 0.3rem 0.4rem !important; max-width: 100% !important; }
+        .block-container { padding: 0.4rem 0.6rem !important; max-width: 100% !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
         
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
             padding: 6px 8px; border-radius: 6px; text-align: center; margin-bottom: 6px; border: 1px solid #fbcfe8; width: 100%; box-sizing: border-box;
         }
-        .brand-banner .brand-title { font-size: 14px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
+        .brand-banner .brand-title { font-size: 15px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
         .brand-banner .brand-phone { font-size: 10px !important; font-weight: 800 !important; color: #9d174d !important; margin: 0; }
 
         div.stButton > button, div[data-testid="stFormSubmitButton"] > button {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%) !important;
-            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 4px !important; width: 100% !important; padding: 4px !important;
+            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; width: 100% !important; padding: 6px !important;
         }
 
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 1rem; width: 100%; }
@@ -132,47 +132,44 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    # 30:70 horizontal split view on the single window
-    col_cat, col_prod = st.columns([0.3, 0.7], gap="small")
+    st.markdown("##### Select Category")
+    if all_categories:
+        # Horizontal radio selection fits mobile screens perfectly without breaking layout
+        selected_cat = st.radio("Categories", all_categories, index=all_categories.index(st.session_state.selected_menu) if st.session_state.selected_menu in all_categories else 0, horizontal=True, label_visibility="collapsed")
+        if selected_cat != st.session_state.selected_menu:
+            st.session_state.selected_menu = selected_cat
+            st.rerun()
+            
+    st.markdown("---")
+    current_cat = st.session_state.get("selected_menu", all_categories[0] if all_categories else "")
+    st.markdown(f"##### Products: {current_cat}")
+    filtered = [p for p in product_records if p['category'] == current_cat]
     
-    with col_cat:
-        st.markdown("##### Categories")
-        for cat in all_categories:
-            btn_label = f"📍 {cat}" if st.session_state.selected_menu == cat else cat
-            if st.button(btn_label, key=f"cat_btn_{cat}", use_container_width=True):
-                st.session_state.selected_menu = cat
-                st.rerun()
-
-    with col_prod:
-        current_cat = st.session_state.get("selected_menu", all_categories[0] if all_categories else "")
-        st.markdown(f"##### {current_cat}")
-        filtered = [p for p in product_records if p['category'] == current_cat]
-        
-        if filtered:
-            for idx, prod in enumerate(filtered):
-                q_key = f"qty_{current_cat}_{idx}"
-                if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
+    if filtered:
+        for idx, prod in enumerate(filtered):
+            q_key = f"qty_{current_cat}_{idx}"
+            if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
+            
+            with st.container(border=True):
+                pc1, pc2 = st.columns([2.0, 2.0], gap="small")
+                with pc1:
+                    st.markdown(f"**{prod['name']}**<br><span style='color:#64748b;'>₹{prod['price']}</span>", unsafe_allow_html=True)
+                with pc2:
+                    q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
+                    with q_m:
+                        if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
+                            st.session_state.quantities[q_key] -= 1; st.rerun()
+                    with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                    with q_p:
+                        if st.button("+", key=f"p_{q_key}", use_container_width=True):
+                            st.session_state.quantities[q_key] += 1; st.rerun()
                 
-                with st.container(border=True):
-                    pc1, pc2 = st.columns([2.0, 2.0], gap="small")
-                    with pc1:
-                        st.markdown(f"**{prod['name']}**<br><span style='color:#64748b;'>₹{prod['price']}</span>", unsafe_allow_html=True)
-                    with pc2:
-                        q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
-                        with q_m:
-                            if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
-                                st.session_state.quantities[q_key] -= 1; st.rerun()
-                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800; padding-top:2px;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
-                        with q_p:
-                            if st.button("+", key=f"p_{q_key}", use_container_width=True):
-                                st.session_state.quantities[q_key] += 1; st.rerun()
-                    
-                    if st.button("Add to Cart", key=f"add_{q_key}", use_container_width=True):
-                        st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
-                        st.success("Added!")
-                        st.rerun()
-        else:
-            st.info("No items found.")
+                if st.button("Add to Cart", key=f"add_{q_key}", use_container_width=True):
+                    st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
+                    st.success("Added!")
+                    st.rerun()
+    else:
+        st.info("No items found in this category.")
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
     if st.session_state.cart:
