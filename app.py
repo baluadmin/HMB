@@ -33,17 +33,21 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Linked to your provided sheet (HMD FULL tab / CSV export)
+NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
+NEW_GOOGLE_SCRIPT_URL = ""
+
 if "logged_in_user" not in st.session_state:
     st.session_state.update({
         "logged_in_user": None, "user_phone": None, "user_role": None,
-        "cart": [], "current_view": "Home", "selected_menu": "Nuts", "quantities": {}
+        "cart": [], "current_view": "Home", "selected_menu": "", "quantities": {}
     })
 
-GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq1vB7RSGZA8aM5QOOxpSKxN06vEpYs14Yupx687pWZ4KNa0bkvAEO12QJQZ_v88DT/exec"
-
 def log_login_to_sheet(name, phone):
+    if not NEW_GOOGLE_SCRIPT_URL:
+        return
     try:
-        requests.post(GOOGLE_SCRIPT_URL, json={"Type": "Login", "Customer_Name": name, "Primary_Phone": phone})
+        requests.post(NEW_GOOGLE_SCRIPT_URL, json={"Type": "Login", "Customer_Name": name, "Primary_Phone": phone})
     except Exception:
         pass
 
@@ -80,9 +84,12 @@ st.markdown("---")
 @st.cache_data(ttl=2)
 def load_inventory_from_sheet():
     try:
-        df = pd.read_csv("https://docs.google.com/spreadsheets/d/1zXy8vwQtv2h5PooBLLEfVHAI_-aNBJK2K44kEMvczLQ/export?format=csv")
-        df.to_csv("inventory.csv", index=False)
-        return df
+        if NEW_GOOGLE_SHEET_CSV_URL:
+            df = pd.read_csv(NEW_GOOGLE_SHEET_CSV_URL)
+            df.to_csv("inventory.csv", index=False)
+            return df
+        else:
+            return pd.read_csv("inventory.csv") if os.path.exists("inventory.csv") else pd.DataFrame()
     except Exception:
         return pd.read_csv("inventory.csv") if os.path.exists("inventory.csv") else pd.DataFrame()
 
@@ -90,12 +97,14 @@ inv_df = load_inventory_from_sheet()
 product_records = []
 if not inv_df.empty:
     for _, row in inv_df.iterrows():
-        product_records.append({
-            "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]),
-            "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
-            "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "",
-            "image": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
-        })
+        # Ensure row has enough items and skip empty rows where id/name is missing
+        if len(row) > 4 and pd.notna(row.iloc[0]) and pd.notna(row.iloc[1]):
+            product_records.append({
+                "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]),
+                "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
+                "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "",
+                "image": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
+            })
 
 if not product_records:
     product_records = [
@@ -106,25 +115,29 @@ if not product_records:
         {"id": "ITM012", "name": "Mixed Dry Fruits Gift Box", "price": "1500", "stock": "60", "category": "Gift Box", "image": "", "description": ""}
     ]
 
+# Set default selected category to the first available if not set or invalid
+all_categories = sorted(list(set([p['category'] for p in product_records])))
+if not st.session_state.selected_menu or st.session_state.selected_menu not in all_categories:
+    if all_categories:
+        st.session_state.selected_menu = all_categories[0]
+
 def process_cart_checkout(address, secondary_phone, description):
     if not st.session_state.cart: return "Your cart is empty."
     cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
-    try:
-        requests.post(GOOGLE_SCRIPT_URL, json={
-            "Type": "Order", "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "Customer_Name": st.session_state.logged_in_user, "Primary_Phone": st.session_state.user_phone,
-            "Items": cart_summary, "Address": address, "Secondary_Phone": secondary_phone, "Description": description
-        })
-    except Exception:
-        pass
+    if NEW_GOOGLE_SCRIPT_URL:
+        try:
+            requests.post(NEW_GOOGLE_SCRIPT_URL, json={
+                "Type": "Order", "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "Customer_Name": st.session_state.logged_in_user, "Primary_Phone": st.session_state.user_phone,
+                "Items": cart_summary, "Address": address, "Secondary_Phone": secondary_phone, "Description": description
+            })
+        except Exception:
+            pass
     st.session_state.cart = []
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    # Using separate tabs for Categories and Products to ensure perfect mobile layout without squishing
     cat_tab, prod_tab = st.tabs(["📂 Categories", "🥜 Products"])
-    
-    all_categories = sorted(list(set([p['category'] for p in product_records])))
     
     with cat_tab:
         st.markdown("##### Select Category")
@@ -135,7 +148,7 @@ if st.session_state.current_view == "Home":
                 st.rerun()
 
     with prod_tab:
-        current_cat = st.session_state.get("selected_menu", "Nuts")
+        current_cat = st.session_state.get("selected_menu", all_categories[0] if all_categories else "Nuts")
         st.markdown(f"##### Products in: {current_cat}")
         filtered = [p for p in product_records if p['category'] == current_cat]
         
@@ -163,7 +176,7 @@ if st.session_state.current_view == "Home":
                         st.success("Added!")
                         st.rerun()
         else:
-            st.info("No items found in this category.")
+            st.info("No items found in this category. Please add items to your Google Sheet.")
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
     if st.session_state.cart:
