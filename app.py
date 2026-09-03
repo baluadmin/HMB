@@ -36,6 +36,8 @@ NEW_GOOGLE_SCRIPT_URL = ""
 
 if "cart" not in st.session_state:
     st.session_state.cart = []
+if "search_query" not in st.session_state:
+    st.session_state.search_query = ""
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -79,13 +81,20 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search Bar
-search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
+# Search Bar with real-time suggestion matching
+all_product_names = [p['name'] for p in product_records]
+typed_query = st.selectbox(
+    "Search",
+    options=[""] + all_product_names,
+    index=0,
+    format_func=lambda x: "🔍 Type to search items..." if x == "" else x,
+    label_visibility="collapsed"
+)
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-if search_query.strip():
-    filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
+if typed_query and typed_query != "":
+    filtered_products = [p for p in product_records if typed_query.lower() in p['name'].lower()]
 else:
     filtered_products = product_records
 
