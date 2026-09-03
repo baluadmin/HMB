@@ -13,12 +13,6 @@ st.markdown("""
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         .block-container { padding-top: 2px !important; padding-bottom: 0.4rem !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
-        
-        .compact-header {
-            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; border: 1px solid #fecdd3;
-            display: flex; justify-content: space-between; align-items: center;
-        }
 
         div.stButton > button {
             background: #ffffff !important;
@@ -56,7 +50,7 @@ def log_login_to_sheet(name, phone):
 if not st.session_state.logged_in_user:
     st.markdown('<div style="display: flex; justify-content: center;"><div class="login-box">', unsafe_allow_html=True)
     st.markdown("<h3 style='color: #881337; margin-bottom: 2px;'>🥜 HMB Nuts & Spices</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; font-size: 11px; margin-bottom: 12px;'>Thiruverkadu | Customer Login</p>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748b; font-size: 11px; margin-bottom: 12px;'>Customer Login</p>", unsafe_allow_html=True)
     with st.form("mobile_login_form"):
         cust_name = st.text_input("Your Full Name:")
         cust_phone = "".join([c for c in st.text_input("Mobile Number (10 digits):", max_chars=10) if c.isdigit()])
@@ -72,16 +66,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Header bar without name board, showing user info and quick shop action
-st.markdown(f"""
-    <div class="compact-header">
-        <div>
-            <span style="font-size: 11px; font-weight: 800; color: #881337;">📍 Thiruverkadu Store</span>
-        </div>
-        <div style="font-size: 10px; font-weight: 800; color: #475569;">👤 {st.session_state.logged_in_user}</div>
-    </div>
-""", unsafe_allow_html=True)
-
+# Action strip directly at the top without location or username info
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
     if st.button("🏠 Shop", use_container_width=True):
@@ -209,7 +194,7 @@ else:
         st.markdown("---")
         st.markdown("#### Delivery Checkout")
         with st.form("mobile_checkout"):
-            address = st.text_area("Delivery Address (Thiruverkadu area):")
+            address = st.text_area("Delivery Address:")
             sec_phone = "".join([c for c in st.text_input("Alternate Phone (10 digits):", max_chars=10) if c.isdigit()])
             desc = st.text_input("Special instructions (optional):")
             if st.form_submit_button("Place Order Now", use_container_width=True):
