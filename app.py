@@ -121,7 +121,7 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    col_menu, col_items = st.columns([1, 2.2], gap="small")
+    col_menu, col_items = st.columns([3, 7], gap="small")
     
     with col_menu:
         st.markdown("##### Categories")
