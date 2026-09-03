@@ -14,9 +14,6 @@ st.markdown("""
         .block-container { padding-top: 1.2rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
 
-        .nav-container { display: flex; gap: 6px; width: 100%; margin-bottom: 8px; }
-        .nav-container > div { flex: 1; }
-
         div.stButton > button {
             background: #ffffff !important;
             color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 6px 2px !important; min-height: unset !important; width: 100% !important;
@@ -69,26 +66,6 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Single-line flex container for top navigation buttons
-st.markdown('<div class="nav-container">', unsafe_allow_html=True)
-nav1, nav2, nav3 = st.columns(3, gap="small")
-with nav1:
-    if st.button("Shop", use_container_width=True):
-        st.session_state.current_view = "Shop"
-        st.rerun()
-with nav2:
-    cart_count = len(st.session_state.cart)
-    if st.button(f"Cart({cart_count})", use_container_width=True):
-        st.session_state.current_view = "Cart"
-        st.rerun()
-with nav3:
-    if st.button("Logout", use_container_width=True):
-        st.session_state.clear()
-        st.rerun()
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown("<hr style='margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
-
 @st.cache_data(ttl=2)
 def load_shop_inventory():
     try:
@@ -139,91 +116,60 @@ def process_order_submission(address, secondary_phone, description):
     st.session_state.cart = []
     return f"Order placed successfully for: {cart_summary}!"
 
-if st.session_state.current_view == "Shop":
-    search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
+search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
-    if all_categories:
-        cat_cols = st.columns(len(all_categories), gap="small")
-        for i, cat in enumerate(all_categories):
-            with cat_cols[i]:
-                is_selected = (st.session_state.selected_category == cat)
-                if st.button(cat, key=f"pill_{cat}", use_container_width=True):
-                    st.session_state.selected_category = cat
-                    st.rerun()
+if all_categories:
+    cat_cols = st.columns(len(all_categories), gap="small")
+    for i, cat in enumerate(all_categories):
+        with cat_cols[i]:
+            is_selected = (st.session_state.selected_category == cat)
+            if st.button(cat, key=f"pill_{cat}", use_container_width=True):
+                st.session_state.selected_category = cat
+                st.rerun()
 
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
-    current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
-    
-    if search_query.strip():
-        filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
-        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
-    else:
-        filtered_products = [p for p in product_records if p['category'] == current_cat]
-        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
+st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
 
-    if filtered_products:
-        for i in range(0, len(filtered_products), 2):
-            cols = st.columns(2, gap="small")
-            for j in range(2):
-                if i + j < len(filtered_products):
-                    prod = filtered_products[i + j]
-                    idx = i + j
-                    q_key = f"qty_app_{idx}"
-                    if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
-                    
-                    # Safe price parsing
-                    raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
-                    base_price = float(raw_price_str) if raw_price_str else 0.0
-                    mrp_price = int(base_price * 1.1)
-                    
-                    with cols[j]:
-                        with st.container(border=True):
-                            st.markdown(
-                                f"""
-                                <div style="background: #ffffff; border-radius: 8px;">
-                                    <div style="position: relative; background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
-                                        📦 PRODUCT IMG
-                                    </div>
-                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
-                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
-                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
-                                </div>
-                                """, 
-                                unsafe_allow_html=True
-                            )
-                            
-                            if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
-                                st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
-                                st.success("Added!")
-                                st.rerun()
-    else:
-        st.info("No items found.")
+if search_query.strip():
+    filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
+    st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
 else:
-    st.markdown("### 🛒 Your Shopping Cart")
-    if st.session_state.cart:
-        for idx, item in enumerate(st.session_state.cart):
-            c1, c2 = st.columns([4, 1], gap="small")
-            with c1: st.markdown(f"- **{item['product']}** ({item['quantity']})")
-            with c2:
-                if st.button("✕", key=f"rem_{idx}", use_container_width=True):
-                    st.session_state.cart.pop(idx)
-                    st.rerun()
-        
-        st.markdown("---")
-        st.markdown("#### Delivery Checkout")
-        with st.form("mobile_checkout"):
-            address = st.text_area("Delivery Address:")
-            sec_phone = "".join([c for c in st.text_input("Alternate Phone (10 digits):", max_chars=10) if c.isdigit()])
-            desc = st.text_input("Special instructions (optional):")
-            if st.form_submit_button("Place Order Now", use_container_width=True):
-                if address.strip() and len(sec_phone) == 10:
-                    res_msg = process_order_submission(address, sec_phone, desc)
-                    st.success(res_msg)
-                    st.session_state.current_view = "Shop"
-                    st.rerun()
-                else:
-                    st.warning("Please provide a valid delivery address and 10-digit alternate phone number.")
-    else:
-        st.info("Your cart is empty. Go back to Shop to add items.")
+    filtered_products = [p for p in product_records if p['category'] == current_cat]
+    st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
+
+if filtered_products:
+    for i in range(0, len(filtered_products), 2):
+        cols = st.columns(2, gap="small")
+        for j in range(2):
+            if i + j < len(filtered_products):
+                prod = filtered_products[i + j]
+                idx = i + j
+                
+                raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
+                base_price = float(raw_price_str) if raw_price_str else 0.0
+                mrp_price = int(base_price * 1.1)
+                
+                with cols[j]:
+                    with st.container(border=True):
+                        st.markdown(
+                            f"""
+                            <div style="background: #ffffff; border-radius: 8px;">
+                                <div style="position: relative; background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
+                                    📦 PRODUCT IMG
+                                </div>
+                                <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
+                                <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
+                                <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
+                                <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
+                                <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
+                            </div>
+                            """, 
+                            unsafe_allow_html=True
+                        )
+                        
+                        if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
+                            st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
+                            st.success("Added!")
+                            st.rerun()
+else:
+    st.info("No items found.")
