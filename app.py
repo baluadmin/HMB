@@ -170,16 +170,17 @@ else:
     if active_query:
         matching_suggestions = get_matching_products(active_query, product_records)
 
+    # Show suggestion dropdown right below the search bar matching user reference style
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
         st.markdown("""
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
         """, unsafe_allow_html=True)
         
         for idx, prod in enumerate(matching_suggestions[:6]):
-            sug_col1, sug_col2 = st.columns([1, 5], gap="small")
+            sug_col1, sug_col2 = st.columns([1, 6], gap="small")
             with sug_col1:
                 st.markdown("""
-                    <div style="background: #f1f5f9; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
+                    <div style="background: #f1f5f9; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
                 """, unsafe_allow_html=True)
             with sug_col2:
                 if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
