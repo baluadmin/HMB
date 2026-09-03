@@ -11,14 +11,13 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
-        /* Added more space at the top edge */
-        .block-container { padding-top: 1.2rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin: auto; }
+        .block-container { padding-top: 1.5rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
 
-        /* Ultra-compact button sizing for single-line fit */
+        /* Compact button sizing to fit side-by-side nicely */
         div.stButton > button {
             background: #ffffff !important;
-            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 4px !important; padding: 2px 1px !important; min-height: unset !important; width: 100% !important;
+            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 4px !important; padding: 4px 2px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #fff1f2 !important; }
 
@@ -68,7 +67,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Shop, Cart, and Logout in a single seamless line with top spacing
+# Shop, Cart, and Logout in a single horizontal row at the top
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
     if st.button("Shop", use_container_width=True):
@@ -84,7 +83,7 @@ with nav3:
         st.session_state.clear()
         st.rerun()
 
-st.markdown("<hr style='margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -148,15 +147,15 @@ if st.session_state.current_view == "Shop":
                     st.session_state.selected_category = cat
                     st.rerun()
 
-    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
     current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
     
     if search_query.strip():
         filtered_products = [p for p in product_records if search_query.lower() in p['name'].lower() or search_query.lower() in p['category'].lower()]
-        st.markdown(f"<p style='font-size: 10px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>Search Results for '{search_query}'</p>", unsafe_allow_html=True)
     else:
         filtered_products = [p for p in product_records if p['category'] == current_cat]
-        st.markdown(f"<p style='font-size: 10px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -170,11 +169,11 @@ if st.session_state.current_view == "Shop":
                     
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown("<div style='background: #f1f5f9; height: 35px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 2px;'>📦 FRESH</div>", unsafe_allow_html=True)
-                            st.markdown("<div style='color: #0284c7; font-size: 8px; font-weight: 800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 800; font-size: 10px; height: 24px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color: #64748b; font-size: 8px; height: 14px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 900; font-size: 11px; color: #e11d48; margin: 2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='background: #f1f5f9; height: 45px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 2px;'>📦 FRESH</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='color: #0284c7; font-size: 9px; font-weight: 800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 800; font-size: 11px; height: 26px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color: #64748b; font-size: 9px; height: 15px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 900; font-size: 12px; color: #e11d48; margin: 2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
                             
                             if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
                                 st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
