@@ -79,7 +79,7 @@ with top_col2:
 
 st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
-# Search state initialization
+# Search state management
 if "search_query" not in st.session_state:
     st.session_state.search_query = ""
 
@@ -88,26 +88,35 @@ def handle_search_update():
 
 search_query = st.text_input("Search", value=st.session_state.search_query, placeholder="🔍 Search dry fruits, nuts, seeds...", key="search_input_field", on_change=handle_search_update, label_visibility="collapsed")
 
-# Dynamic live suggestions matching typed text
 active_query = st.session_state.search_input_field.strip()
-matching_suggestions = []
-if active_query:
-    matching_suggestions = [p['name'] for p in product_records if active_query.lower() in p['name'].lower()]
 
-# Show clickable suggestion chips if typing and matches found
-if matching_suggestions and active_query.lower() != matching_suggestions[0].lower():
-    st.markdown("<p style='font-size: 10px; font-weight: 800; color: #64748b; margin: 2px 0;'>Suggestions:</p>", unsafe_allow_html=True)
-    sug_cols = st.columns(min(len(matching_suggestions), 3), gap="small")
-    for idx, suggestion in enumerate(matching_suggestions[:3]):
-        with sug_cols[idx]:
-            if st.button(suggestion, key=f"sug_{idx}", use_container_width=True):
-                st.session_state.search_query = suggestion
-                st.session_state.search_input_field = suggestion
+# Dropdown suggestion list matching Zepto/Blinkit search style with product thumbnail previews on the left
+matching_products = []
+if active_query:
+    matching_products = [p for p in product_records if active_query.lower() in p['name'].lower()]
+
+if matching_products and active_query.lower() != matching_products[0]['name'].lower():
+    st.markdown("""
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+    """, unsafe_allow_html=True)
+    
+    for idx, prod in enumerate(matching_products[:6]):
+        sug_col1, sug_col2 = st.columns([1, 5], gap="small")
+        with sug_col1:
+            st.markdown("""
+                <div style="background: #f1f5f9; width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
+            """, unsafe_allow_html=True)
+        with sug_col2:
+            if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
+                st.session_state.search_query = prod['name']
+                st.session_state.search_input_field = prod['name']
                 st.rerun()
+                
+    st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-# Filter products based on query or show full default menu instantly if cleared
+# Filter catalog products or default to full menu instantly when search box is empty
 if not active_query:
     filtered_products = product_records
 else:
