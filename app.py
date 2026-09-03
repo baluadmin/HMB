@@ -13,9 +13,9 @@ st.set_page_config(
     layout="wide",
 )
 
-# Force fixed desktop viewport width (1280px) so mobile devices display the full desktop layout
+# Enforce fluid responsive mobile scaling to fit device screens naturally without desktop clipping
 st.markdown("""
-    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
 
@@ -23,10 +23,23 @@ st.markdown("""
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
             font-size: 14px !important;
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
         }
 
         .stApp {
             background-color: #fff5f8 !important; 
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+        }
+
+        .block-container {
+            padding-top: 0.3rem !important;
+            padding-bottom: 0rem !important;
+            padding-left: 0.4rem !important;
+            padding-right: 0.4rem !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
         }
 
         /* Hide Streamlit default top header, menu, share, github, and badges */
@@ -73,14 +86,14 @@ st.markdown("""
             pointer-events: none !important;
         }
         
-        /* Enforce image sizing for desktop grid */
+        /* Enforce image sizing */
         [data-testid="stImage"] {
             width: 100% !important;
             pointer-events: none !important;
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 80px !important;
+            height: 70px !important;
             object-fit: cover !important;
             border-radius: 6px !important;
             pointer-events: none !important;
@@ -90,7 +103,7 @@ st.markdown("""
         label, .stTextInput label, p, span, div[data-testid="stMarkdownContainer"] p {
             color: #0f172a !important;
             font-weight: 700 !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
         }
         
         /* Input boxes styling */
@@ -98,7 +111,7 @@ st.markdown("""
             background-color: #ffffff !important;
             color: #0f172a !important;
             border: 2px solid #cbd5e1 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;
             font-weight: 700 !important;
             border-radius: 8px !important;
             box-sizing: border-box !important;
@@ -111,19 +124,19 @@ st.markdown("""
         /* Soft Light Pink Gradient Header Banner */
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
-            padding: 8px 10px;
+            padding: 6px 8px;
             border-radius: 8px;
             color: #831843 !important;
             text-align: center;
             box-shadow: 0 2px 8px -2px rgba(251, 207, 232, 0.3);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             border: 1px solid #fbcfe8;
             width: 100%;
             box-sizing: border-box;
         }
         .brand-banner .brand-title {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 22px !important;
+            font-size: 18px !important;
             font-weight: 900 !important;
             letter-spacing: 0.5px;
             color: #831843 !important;
@@ -131,7 +144,7 @@ st.markdown("""
             text-transform: lowercase;
         }
         .brand-banner .brand-phone {
-            font-size: 13px !important;
+            font-size: 12px !important;
             font-weight: 800 !important;
             letter-spacing: 0.5px;
             color: #9d174d !important;
@@ -144,9 +157,9 @@ st.markdown("""
             color: #0f172a !important;
             border: 1px solid #f472b6 !important;
             font-weight: 800 !important;
-            font-size: 13px !important;
+            font-size: 12px !important;
             border-radius: 6px !important;
-            padding: 0.2rem 0.3rem !important;
+            padding: 0.2rem 0.2rem !important;
             width: 100% !important;
             display: block !important;
             box-shadow: 0 2px 6px rgba(251, 207, 232, 0.4) !important;
@@ -157,17 +170,18 @@ st.markdown("""
             color: #0f172a !important;
         }
 
-        /* Enforce desktop-style horizontal blocks */
-        div[data-testid="stHorizontalBlock"] {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            align-items: center !important;
-        }
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-            flex: 1 1 auto !important;
-            min-width: 0px !important;
-            padding: 0px 2px !important;
+        /* Responsive layout rules: on mobile screens (< 768px), stack the Menu and Products vertically so nothing is cut off */
+        @media (max-width: 768px) {
+            div[data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                flex-wrap: wrap !important;
+            }
+            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+                width: 100% !important;
+                flex: 1 1 100% !important;
+                min-width: 100% !important;
+                padding: 2px 0px !important;
+            }
         }
 
         /* Centered Login Wrapper */
@@ -176,7 +190,7 @@ st.markdown("""
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding-top: 2rem;
+            padding-top: 1.5rem;
             width: 100%;
             box-sizing: border-box;
         }
@@ -191,7 +205,7 @@ st.markdown("""
 
         .login-title h1 {
             font-family: 'Mulish', sans-serif !important;
-            font-size: 26px !important;
+            font-size: 24px !important;
             font-weight: 900 !important;
             margin: 0 0 5px 0;
             color: #0f172a !important;
@@ -199,14 +213,14 @@ st.markdown("""
         }
 
         .login-title p {
-            font-size: 13px !important;
+            font-size: 12px !important;
             color: #64748b !important;
             margin: 0;
         }
 
         .login-card-container {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             margin: 0 auto;
             padding: 0 10px;
             box-sizing: border-box;
@@ -214,18 +228,18 @@ st.markdown("""
 
         .login-card {
             width: 100%;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 10px;
             background-color: #ffffff !important;
             border: 2px solid #fbcfe8 !important;
-            box-shadow: 0 10px 25px -5px rgba(251, 207, 232, 0.3);
+            box-shadow: 0 8px 20px -5px rgba(251, 207, 232, 0.3);
             text-align: center;
             box-sizing: border-box;
         }
 
         .login-card h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px !important;
+            margin: 0 0 8px 0;
+            font-size: 16px !important;
             font-weight: 800 !important;
             color: #1e293b !important;
         }
@@ -327,7 +341,7 @@ if not st.session_state.logged_in_user:
     st.stop()
 
 
-# --- AFTER LOGIN: DESKTOP VIEW HEADER & NAVIGATION ---
+# --- AFTER LOGIN: RESPONSIVE HEADER & NAVIGATION ---
 st.markdown("""
     <div class="brand-banner">
         <h1 class="brand-title">hmb nuts and seeds thiruverkadu</h1>
@@ -450,7 +464,7 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- DESKTOP TWO-COLUMN LAYOUT ---
+    # --- RESPONSIVE LAYOUT (Stacks vertically on mobile, side-by-side on desktop) ---
     col_menu, col_items = st.columns([1.1, 2.4], gap="small")
 
     with col_menu:
@@ -567,7 +581,7 @@ else:
             raw_sec_phone = st.text_input("Alternative Contact Number:", max_chars=10)
             secondary_phone = "".join([char for char in raw_sec_phone if char.isdigit()])
             
-            product_desc = st.text_area("Product Specifications / Custom Description:")
+            product_desc = st.text_input("Product Specifications / Custom Description:")
             
             submit_checkout = st.form_submit_button("Complete Order", use_container_width=True)
             if submit_checkout:
