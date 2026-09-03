@@ -121,7 +121,8 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    col_menu, col_items = st.columns([3, 7], gap="small")
+    # Exact 30:70 horizontal split for categories (30%) and products (70%)
+    col_menu, col_items = st.columns([0.3, 0.7], gap="small")
     
     with col_menu:
         st.markdown("##### Categories")
