@@ -29,6 +29,23 @@ st.markdown("""
             color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 5px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
+
+        /* Sticky top header and search bar container for stable scrolling */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            background-color: #f8fafc;
+            padding-top: 8px;
+            padding-bottom: 4px;
+        }
+
+        /* Scrollable product catalog viewport wrapper */
+        .scrollable-catalog {
+            max-height: 72vh;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -72,21 +89,6 @@ if not product_records:
         {"id": "ITM002", "name": "W320 Cashew Nuts", "price": "900", "stock": "40", "category": "Nuts", "image": "", "description": "500g"},
         {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "250g"}
     ]
-
-# Top Header Bar: Shop Name on Left, Cart Badge Button on Right
-top_col1, top_col2 = st.columns([3, 1], gap="small")
-with top_col1:
-    if st.button("🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True):
-        st.session_state.current_view = "Shop"
-        st.session_state.search_query = ""
-        st.rerun()
-with top_col2:
-    cart_count = len(st.session_state.cart)
-    if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
-        st.session_state.current_view = "Cart"
-        st.rerun()
-
-st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 if st.session_state.current_view == "Cart":
     st.markdown("### Your Shopping Cart & Checkout")
@@ -143,7 +145,23 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Separate search input text field coupled with a clear/reset action button side-by-side
+    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
+    st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
+    
+    top_col1, top_col2 = st.columns([3, 1], gap="small")
+    with top_col1:
+        if st.button("🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True):
+            st.session_state.current_view = "Shop"
+            st.session_state.search_query = ""
+            st.rerun()
+    with top_col2:
+        cart_count = len(st.session_state.cart)
+        if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
+            st.session_state.current_view = "Cart"
+            st.rerun()
+
+    st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+
     srch_c1, srch_c2 = st.columns([4, 1], gap="small")
     with srch_c1:
         search_query = st.text_input(
@@ -193,7 +211,7 @@ else:
 
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
         st.markdown("""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
         """, unsafe_allow_html=True)
         
         for idx, prod in enumerate(matching_suggestions[:6]):
@@ -209,12 +227,17 @@ else:
                     
         st.markdown("</div>", unsafe_allow_html=True)
 
+    st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
+
     st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
     if not active_query:
         filtered_products = product_records
     else:
         filtered_products = get_matching_products(active_query, product_records)
+
+    # Scrollable container wrapper for products catalog
+    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -252,3 +275,5 @@ else:
                                 st.rerun()
     else:
         st.info("No items found.")
+
+    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
