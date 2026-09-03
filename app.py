@@ -13,28 +13,24 @@ st.set_page_config(
     layout="wide",
 )
 
-# Inject mobile viewport meta tag to completely lock scaling and horizontal scrolling
+# Inject mobile viewport meta tag for proper scaling with enabled vertical scrolling
 st.markdown("""
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 """, unsafe_allow_html=True)
 
 st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
 
-        /* Apply Font Family Globally and prevent horizontal overflow */
+        /* Apply Font Family Globally */
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
             font-size: 18px !important;
-            max-width: 100vw !important;
-            overflow-x: hidden !important;
         }
 
-        /* Force Consistent Light Pink Background and prevent any sidebar/overflow drift */
+        /* Force Consistent Light Pink Background */
         .stApp {
             background-color: #fff5f8 !important; 
-            max-width: 100vw !important;
-            overflow-x: hidden !important;
         }
 
         /* Hide Streamlit default top header, menu, share, github, and badges */
@@ -160,18 +156,18 @@ st.markdown("""
             transition: all 0.2s ease-in-out;
         }
         div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover {
-            background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%) !important;
+            background: linear-gradient(135deg, #fbcfe8 100%, #f472b6 100%) !important;
             color: #0f172a !important;
             box-shadow: 0 6px 15px rgba(244, 114, 182, 0.5) !important;
         }
 
-        /* Fully responsive login wrapper centered without rigid cm units that break mobile view */
+        /* Natural scrolling login wrapper */
         .login-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding-top: 10vh;
+            justify-content: flex-start;
+            padding-top: 2rem;
             width: 100%;
             box-sizing: border-box;
         }
@@ -206,12 +202,11 @@ st.markdown("""
             padding-left: 0.8rem;
             padding-right: 0.8rem;
             max-width: 100% !important;
-            overflow-x: hidden !important;
         }
 
         .login-title {
             text-align: center;
-            margin: 5px 0 10px 0;
+            margin: 5px 0 15px 0;
             width: 100%;
         }
 
@@ -292,7 +287,7 @@ def log_login_to_sheet(name, phone):
         print(f"Login sheet error: {e}")
 
 
-# 2. Centered Customer Login Screen (Before Login) fully responsive for mobile screens
+# 2. Centered Customer Login Screen (Before Login) fully responsive with normal scrolling enabled
 if not st.session_state.logged_in_user:
 
     st.markdown('<div class="login-wrapper">', unsafe_allow_html=True)
