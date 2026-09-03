@@ -66,7 +66,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Action strip directly at the top without location or username info
+# Action strip positioned right at the very top
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
     if st.button("🏠 Shop", use_container_width=True):
