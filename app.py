@@ -94,7 +94,7 @@ st.markdown("""
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 80px !important;
+            height: 90px !important;
             object-fit: cover !important;
             border-radius: 6px !important;
             pointer-events: none !important;
@@ -158,9 +158,9 @@ st.markdown("""
             color: #0f172a !important;
             border: 1px solid #f472b6 !important;
             font-weight: 800 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;
             border-radius: 8px !important;
-            padding: 0.4rem 0.5rem !important;
+            padding: 0.4px 0.5rem !important;
             width: 100% !important;
             display: block !important;
             box-shadow: 0 3px 10px rgba(251, 207, 232, 0.4) !important;
@@ -170,6 +170,18 @@ st.markdown("""
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%) !important;
             color: #0f172a !important;
             box-shadow: 0 5px 12px rgba(244, 114, 182, 0.5) !important;
+        }
+
+        /* Force single-line layout for top navigation bar */
+        div[data-testid="stHorizontalBlock"] {
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+        }
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+            flex: 1 1 auto !important;
+            min-width: 0px !important;
+            padding: 0px 2px !important;
         }
 
         /* Fully responsive login wrapper centered perfectly */
@@ -338,12 +350,10 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Navigation row
-top_comm, top_space, top_c1, top_c2, top_c3 = st.columns([2, 0.2, 1, 1, 1], gap="small")
+# Navigation row: Welcome message, Home, Cart, Logout forced strictly into a single horizontal line
+top_comm, top_c1, top_c2, top_c3 = st.columns([1.6, 1, 1.1, 1], gap="small")
 with top_comm:
     st.markdown(f"👋 **{st.session_state.logged_in_user}**")
-with top_space:
-    st.empty()
 with top_c1:
     if st.button("Home", use_container_width=True):
         st.session_state.current_view = "Home"
@@ -456,83 +466,82 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- MOBILE-FRIENDLY SINGLE COLUMN LAYOUT ---
-    categories = list(set([p['category'] for p in product_records]))
-    
-    # Category selector dropdown at the top
-    current_cat = st.selectbox(
-        "Select Category:",
-        categories,
-        index=categories.index(st.session_state.selected_menu) if st.session_state.selected_menu in categories else 0
-    )
-    
-    if current_cat != st.session_state.selected_menu:
-        st.session_state.selected_menu = current_cat
-        st.session_state.product_page = 0
-        st.rerun()
+    # --- TWO-COLUMN LAYOUT: MENU ON LEFT, ITEMS ON RIGHT ---
+    col_menu, col_items = st.columns([1, 2.5], gap="small")
 
-    st.markdown(f"### {current_cat} Products")
-    filtered_items = [p for p in product_records if p['category'] == current_cat]
-    
-    if filtered_items:
-        items_per_page = 10
-        total_items = len(filtered_items)
-        total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
+    with col_menu:
+        st.markdown("#### Menu")
+        categories = list(set([p['category'] for p in product_records]))
+        for cat in categories:
+            if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
+                st.session_state.selected_menu = cat
+                st.session_state.product_page = 0
+                st.rerun()
+
+    with col_items:
+        current_cat = st.session_state.get("selected_menu", "Nuts")
+        st.markdown(f"#### {current_cat}")
+        filtered_items = [p for p in product_records if p['category'] == current_cat]
         
-        if st.session_state.product_page >= total_pages:
-            st.session_state.product_page = 0
-        
-        start_idx = st.session_state.product_page * items_per_page
-        end_idx = min(start_idx + items_per_page, total_items)
-        current_page_items = filtered_items[start_idx:end_idx]
+        if filtered_items:
+            items_per_page = 6
+            total_items = len(filtered_items)
+            total_pages = max(1, (total_items + items_per_page - 1) // items_per_page)
+            
+            if st.session_state.product_page >= total_pages:
+                st.session_state.product_page = 0
+            
+            start_idx = st.session_state.product_page * items_per_page
+            end_idx = min(start_idx + items_per_page, total_items)
+            current_page_items = filtered_items[start_idx:end_idx]
 
-        for idx, prod in enumerate(current_page_items):
-            global_idx = start_idx + idx
-            qty_key = f"qty_val_{current_cat}_{global_idx}"
-            if qty_key not in st.session_state.quantities:
-                st.session_state.quantities[qty_key] = 1
+            for idx, prod in enumerate(current_page_items):
+                global_idx = start_idx + idx
+                qty_key = f"qty_val_{current_cat}_{global_idx}"
+                if qty_key not in st.session_state.quantities:
+                    st.session_state.quantities[qty_key] = 1
 
-            with st.container(border=True):
-                st.markdown(f"**{prod['name']}**")
-                st.markdown(f"Price: **₹{prod['price']}**")
-                
-                q_minus, q_display, q_plus, q_add = st.columns([1, 1, 1, 2], gap="small")
-                with q_minus:
-                    if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
-                        if st.session_state.quantities[qty_key] > 1:
-                            st.session_state.quantities[qty_key] -= 1
+                with st.container(border=True):
+                    st.markdown(f"**{prod['name']}**")
+                    st.markdown(f"**₹{prod['price']}**")
+                    
+                    q_minus, q_display, q_plus = st.columns([1, 1, 1], gap="small")
+                    with q_minus:
+                        if st.button("-", key=f"minus_{current_cat}_{global_idx}", use_container_width=True):
+                            if st.session_state.quantities[qty_key] > 1:
+                                st.session_state.quantities[qty_key] -= 1
+                                st.rerun()
+                    with q_display:
+                        st.markdown(f"<div style='text-align: center; padding-top: 4px; font-weight: 800;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
+                    with q_plus:
+                        if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
+                            st.session_state.quantities[qty_key] += 1
                             st.rerun()
-                with q_display:
-                    st.markdown(f"<div style='text-align: center; padding-top: 6px; font-weight: 800;'>{st.session_state.quantities[qty_key]}</div>", unsafe_allow_html=True)
-                with q_plus:
-                    if st.button("+", key=f"plus_{current_cat}_{global_idx}", use_container_width=True):
-                        st.session_state.quantities[qty_key] += 1
-                        st.rerun()
-                with q_add:
-                    if st.button("Add", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
+                    
+                    if st.button("Add to Cart", key=f"add_btn_{current_cat}_{global_idx}", use_container_width=True):
                         qty_val = st.session_state.quantities[qty_key]
                         full_q_str = f"{qty_val} Units"
                         st.session_state.cart.append({"product": prod['name'], "quantity": full_q_str})
                         st.success(f"Added!")
                         st.rerun()
-        
-        # Pagination Controls at the bottom
-        if total_pages > 1:
-            pg_prev, pg_info, pg_next = st.columns([1, 2, 1], gap="small")
-            with pg_prev:
-                if st.button("⬅ Prev", use_container_width=True):
-                    if st.session_state.product_page > 0:
-                        st.session_state.product_page -= 1
-                        st.rerun()
-            with pg_info:
-                st.markdown(f"<p style='text-align: center; margin-top: 6px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
-            with pg_next:
-                if st.button("Next ➡", use_container_width=True):
-                    if st.session_state.product_page < total_pages - 1:
-                        st.session_state.product_page += 1
-                        st.rerun()
-    else:
-        st.info("No items found.")
+            
+            # Pagination Controls at the bottom
+            if total_pages > 1:
+                pg_prev, pg_info, pg_next = st.columns([1, 2, 1], gap="small")
+                with pg_prev:
+                    if st.button("⬅ Prev", use_container_width=True):
+                        if st.session_state.product_page > 0:
+                            st.session_state.product_page -= 1
+                            st.rerun()
+                with pg_info:
+                    st.markdown(f"<p style='text-align: center; margin-top: 4px;'>Page {st.session_state.product_page + 1} of {total_pages}</p>", unsafe_allow_html=True)
+                with pg_next:
+                    if st.button("Next ➡", use_container_width=True):
+                        if st.session_state.product_page < total_pages - 1:
+                            st.session_state.product_page += 1
+                            st.rerun()
+        else:
+            st.info("No items found.")
 
 else:
     st.subheader("🛒 Your Shopping Cart & Checkout")
