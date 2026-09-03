@@ -78,6 +78,7 @@ top_col1, top_col2 = st.columns([3, 1], gap="small")
 with top_col1:
     if st.button("🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True):
         st.session_state.current_view = "Shop"
+        st.session_state.search_query = ""
         st.rerun()
 with top_col2:
     cart_count = len(st.session_state.cart)
@@ -126,11 +127,18 @@ if st.session_state.current_view == "Cart":
                     """, unsafe_allow_html=True)
                     
                     st.session_state.cart = []
+                    st.session_state.search_query = ""
                 else:
                     st.warning("Please fill in both the delivery address and alternative contact number.")
+        
+        if st.button("Return to Shop", use_container_width=True):
+            st.session_state.search_query = ""
+            st.session_state.current_view = "Shop"
+            st.rerun()
     else:
         st.info("Your cart is empty.")
         if st.button("Back to Shop", use_container_width=True):
+            st.session_state.search_query = ""
             st.session_state.current_view = "Shop"
             st.rerun()
 
@@ -170,7 +178,6 @@ else:
     if active_query:
         matching_suggestions = get_matching_products(active_query, product_records)
 
-    # Show suggestion dropdown right below the search bar matching user reference style
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
         st.markdown("""
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
