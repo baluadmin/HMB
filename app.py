@@ -6,31 +6,29 @@ import pandas as pd
 import requests
 import streamlit as st
 
-# 1. Streamlit Page Configuration & Professional E-Commerce Styling CSS
+# 1. Streamlit Page Configuration & Professional E-Commerce Styling CSS (Forced Desktop View on Mobile)
 st.set_page_config(
     page_title="HMB Nuts and Seeds",
     page_icon="🥜",
     layout="wide",
 )
 
-# Enforce fluid responsive mobile scaling to fit device screens naturally without desktop clipping
+# Force a fixed desktop viewport width (1200px) so mobile browsers render the full desktop layout without stacking
 st.markdown("""
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=1200">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
 
-        /* Apply font family globally */
+        /* Apply font family globally and enforce fixed minimum desktop width */
         html, body, [class*="css"] {
             font-family: 'Mulish', sans-serif !important;
             font-size: 14px !important;
-            max-width: 100vw !important;
-            overflow-x: hidden !important;
+            min-width: 1200px !important;
         }
 
         .stApp {
             background-color: #fff5f8 !important; 
-            max-width: 100vw !important;
-            overflow-x: hidden !important;
+            min-width: 1200px !important;
         }
 
         .block-container {
@@ -39,7 +37,7 @@ st.markdown("""
             padding-left: 0.4rem !important;
             padding-right: 0.4rem !important;
             max-width: 100% !important;
-            overflow-x: hidden !important;
+            min-width: 1200px !important;
         }
 
         /* Hide Streamlit default top header, menu, share, github, and badges */
@@ -130,7 +128,6 @@ st.markdown("""
             text-align: center;
             box-shadow: 0 2px 8px -2px rgba(251, 207, 232, 0.3);
             margin-bottom: 4px;
-            border: 1px solid #fbcfe8;
             width: 100%;
             box-sizing: border-box;
         }
@@ -168,20 +165,6 @@ st.markdown("""
         div.stButton > button:hover, div[data-testid="stFormSubmitButton"] > button:hover {
             background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%) !important;
             color: #0f172a !important;
-        }
-
-        /* Responsive layout rules: on mobile screens (< 768px), stack the Menu and Products vertically so nothing is cut off */
-        @media (max-width: 768px) {
-            div[data-testid="stHorizontalBlock"] {
-                flex-direction: column !important;
-                flex-wrap: wrap !important;
-            }
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-                width: 100% !important;
-                flex: 1 1 100% !important;
-                min-width: 100% !important;
-                padding: 2px 0px !important;
-            }
         }
 
         /* Centered Login Wrapper */
@@ -341,7 +324,7 @@ if not st.session_state.logged_in_user:
     st.stop()
 
 
-# --- AFTER LOGIN: RESPONSIVE HEADER & NAVIGATION ---
+# --- AFTER LOGIN: DESKTOP HEADER & NAVIGATION ---
 st.markdown("""
     <div class="brand-banner">
         <h1 class="brand-title">hmb nuts and seeds thiruverkadu</h1>
@@ -464,7 +447,7 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- RESPONSIVE LAYOUT (Stacks vertically on mobile, side-by-side on desktop) ---
+    # --- DESKTOP LAYOUT (Maintains side-by-side view on mobile via fixed 1200px viewport) ---
     col_menu, col_items = st.columns([1.1, 2.4], gap="small")
 
     with col_menu:
