@@ -11,25 +11,22 @@ st.markdown("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
-        .block-container { padding: 0.4rem 0.6rem !important; max-width: 480px !important; margin: auto; }
+        .block-container { padding: 0.3rem 0.5rem !important; max-width: 480px !important; margin: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none;}
         
-        .app-header {
+        .compact-header {
             background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
-            padding: 10px 14px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #fecdd3;
-            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 6px 10px; border-radius: 8px; margin-bottom: 4px; border: 1px solid #fecdd3;
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .app-title { font-size: 15px !important; font-weight: 900 !important; color: #881337 !important; margin: 0; text-transform: uppercase; }
-        .app-sub { font-size: 10px !important; font-weight: 700 !important; color: #9f1239 !important; margin: 0; }
 
-        /* Mobile app bottom or top navigation strip styling */
         div.stButton > button {
             background: #ffffff !important;
-            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 8px !important; padding: 6px !important; min-height: unset !important; width: 100% !important;
+            color: #e11d48 !important; border: 1px solid #f43f5e !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #fff1f2 !important; }
 
-        .login-box { width: 100%; max-width: 380px; padding: 20px; border-radius: 14px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 40px auto; box-shadow: 0 6px 16px rgba(0,0,0,0.06); }
+        .login-box { width: 100%; max-width: 380px; padding: 18px; border-radius: 12px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 30px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -58,8 +55,8 @@ def log_login_to_sheet(name, phone):
 
 if not st.session_state.logged_in_user:
     st.markdown('<div style="display: flex; justify-content: center;"><div class="login-box">', unsafe_allow_html=True)
-    st.markdown("<h3 style='color: #881337; margin-bottom: 4px;'>🥜 HMB Nuts & Spices</h3>", unsafe_allow_html=True)
-    st.markdown("<p style='color: #64748b; font-size: 11px; margin-bottom: 16px;'>Thiruverkadu | Customer Login</p>", unsafe_allow_html=True)
+    st.markdown("<h3 style='color: #881337; margin-bottom: 2px;'>🥜 HMB Nuts & Spices</h3>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748b; font-size: 11px; margin-bottom: 12px;'>Thiruverkadu | Customer Login</p>", unsafe_allow_html=True)
     with st.form("mobile_login_form"):
         cust_name = st.text_input("Your Full Name:")
         cust_phone = "".join([c for c in st.text_input("Mobile Number (10 digits):", max_chars=10) if c.isdigit()])
@@ -75,20 +72,18 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-# Mobile App Header Bar
+# Compact Top Bar with Shop Name and User Info
 st.markdown(f"""
-    <div class="app-header">
+    <div class="compact-header">
         <div>
-            <h1 class="app-title">HMB Nuts & Spices</h1>
-            <p class="app-sub">Hi, {st.session_state.logged_in_user} 👋</p>
+            <span style="font-size: 13px; font-weight: 900; color: #881337; text-transform: uppercase;">🥜 HMB Nuts & Spices</span>
+            <span style="font-size: 9px; color: #9f1239; margin-left: 6px;">Thiruverkadu</span>
         </div>
-        <div style="text-align: right;">
-            <span style="background: #e11d48; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 800;">Thiruverkadu</span>
-        </div>
+        <div style="font-size: 10px; font-weight: 800; color: #475569;">👤 {st.session_state.logged_in_user}</div>
     </div>
 """, unsafe_allow_html=True)
 
-# App Navigation Bar (Shop, Cart with badge, Logout)
+# Tight Navigation Action Strip
 nav1, nav2, nav3 = st.columns(3, gap="small")
 with nav1:
     if st.button("🏠 Shop", use_container_width=True):
@@ -104,7 +99,7 @@ with nav3:
         st.session_state.clear()
         st.rerun()
 
-st.markdown("<hr style='margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+st.markdown("<hr style='margin: 4px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -157,21 +152,18 @@ def process_order_submission(address, secondary_phone, description):
     return f"Order placed successfully for: {cart_summary}!"
 
 if st.session_state.current_view == "Shop":
-    # Search input bar matching modern quick-commerce UI
     search_query = st.text_input("Search", placeholder="🔍 Search dry fruits, nuts, seeds...", label_visibility="collapsed")
 
-    # Horizontal Category Pills selection
     if all_categories:
         cat_cols = st.columns(len(all_categories), gap="small")
         for i, cat in enumerate(all_categories):
             with cat_cols[i]:
                 is_selected = (st.session_state.selected_category == cat)
-                btn_type = "primary" if is_selected else "secondary"
                 if st.button(cat, key=f"pill_{cat}", use_container_width=True):
                     st.session_state.selected_category = cat
                     st.rerun()
 
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 2px;'></div>", unsafe_allow_html=True)
     current_cat = st.session_state.get("selected_category", all_categories[0] if all_categories else "")
     
     if search_query.strip():
@@ -182,7 +174,6 @@ if st.session_state.current_view == "Shop":
         st.markdown(f"<p style='font-size: 11px; font-weight: 700; color: #64748b;'>⚡ Fresh in {current_cat}</p>", unsafe_allow_html=True)
 
     if filtered_products:
-        # 2-column mobile app product grid
         for i in range(0, len(filtered_products), 2):
             cols = st.columns(2, gap="small")
             for j in range(2):
@@ -194,11 +185,11 @@ if st.session_state.current_view == "Shop":
                     
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown("<div style='background: #f1f5f9; height: 60px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 6px;'>📦 HMB FRESH</div>", unsafe_allow_html=True)
+                            st.markdown("<div style='background: #f1f5f9; height: 50px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 4px;'>📦 HMB FRESH</div>", unsafe_allow_html=True)
                             st.markdown("<div style='color: #0284c7; font-size: 9px; font-weight: 800;'>⚡ 5 MINS</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 800; font-size: 11px; height: 30px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='color: #64748b; font-size: 9px; height: 18px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='font-weight: 900; font-size: 12px; color: #e11d48; margin: 4px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 800; font-size: 11px; height: 28px; overflow: hidden; color: #0f172a;'>{prod['name']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='color: #64748b; font-size: 9px; height: 16px; overflow: hidden;'>{prod['description']}</div>", unsafe_allow_html=True)
+                            st.markdown(f"<div style='font-weight: 900; font-size: 12px; color: #e11d48; margin: 2px 0;'>₹{prod['price']}</div>", unsafe_allow_html=True)
                             
                             if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
                                 st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
