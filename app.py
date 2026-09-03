@@ -11,27 +11,23 @@ st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 14px !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; font-size: 13px !important; }
         .stApp { background-color: #fff5f8 !important; }
-        .block-container { padding: 0.3rem 0.4rem !important; max-width: 100% !important; }
+        .block-container { padding: 0.2rem 0.3rem !important; max-width: 100% !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"], section[data-testid="stStatusWidget"] {visibility: hidden; display: none;}
         
         .brand-banner {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%);
-            padding: 6px 8px; border-radius: 8px; text-align: center; margin-bottom: 4px; border: 1px solid #fbcfe8;
+            padding: 4px 6px; border-radius: 6px; text-align: center; margin-bottom: 2px; border: 1px solid #fbcfe8;
         }
-        .brand-banner .brand-title { font-size: 18px !important; font-weight: 900 !important; color: #831843 !important; margin: 0 0 2px 0; text-transform: lowercase; }
-        .brand-banner .brand-phone { font-size: 12px !important; font-weight: 800 !important; color: #9d174d !important; margin: 0; }
+        .brand-banner .brand-title { font-size: 16px !important; font-weight: 900 !important; color: #831843 !important; margin: 0; text-transform: lowercase; }
+        .brand-banner .brand-phone { font-size: 11px !important; font-weight: 800 !important; color: #9d174d !important; margin: 0; }
 
         div.stButton > button, div[data-testid="stFormSubmitButton"] > button {
             background: linear-gradient(135deg, #ffe4e6 0%, #fbcfe8 100%) !important;
-            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 12px !important; border-radius: 6px !important; width: 100% !important;
+            color: #0f172a !important; border: 1px solid #f472b6 !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; width: 100% !important; padding: 2px !important;
         }
 
-        @media (max-width: 768px) {
-            div[data-testid="stHorizontalBlock"] { flex-direction: column !important; flex-wrap: wrap !important; }
-            div[data-testid="stHorizontalBlock"] > div[data-testid="column"] { width: 100% !important; flex: 1 1 100% !important; min-width: 100% !important; padding: 2px 0px !important; }
-        }
         .login-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 1.5rem; width: 100%; }
         .login-card { width: 100%; max-width: 380px; padding: 12px; border-radius: 10px; background-color: #ffffff !important; border: 2px solid #fbcfe8 !important; text-align: center; margin: 0 auto; }
     </style>
@@ -40,8 +36,7 @@ st.markdown("""
 if "logged_in_user" not in st.session_state:
     st.session_state.update({
         "logged_in_user": None, "user_phone": None, "user_role": None,
-        "cart": [], "current_view": "Home", "selected_menu": "Nuts",
-        "product_page": 0, "quantities": {}
+        "cart": [], "current_view": "Home", "selected_menu": "Nuts", "quantities": {}
     })
 
 GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzq1vB7RSGZA8aM5QOOxpSKxN06vEpYs14Yupx687pWZ4KNa0bkvAEO12QJQZ_v88DT/exec"
@@ -69,7 +64,7 @@ if not st.session_state.logged_in_user:
     st.markdown('</div></div>', unsafe_allow_html=True)
     st.stop()
 
-st.markdown('<div class="brand-banner"><h1 class="brand-title">hmb nuts and seeds thiruverkadu</h1><p class="brand-phone">📞 Mobile: 9840450113</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-banner"><h1 class="brand-title">hmb nuts and seeds thiruverkadu</h1><p class="brand-phone">📞 9840450113</p></div>', unsafe_allow_html=True)
 
 top_comm, top_c1, top_c2, top_c3 = st.columns([1.5, 1, 1, 1], gap="small")
 with top_comm: st.markdown(f"👋 **{st.session_state.logged_in_user}**")
@@ -126,53 +121,43 @@ def process_cart_checkout(address, secondary_phone, description):
     return f"Order placed for: {cart_summary}."
 
 if st.session_state.current_view == "Home":
-    col_menu, col_items = st.columns([1.1, 2.4], gap="small")
+    col_menu, col_items = st.columns([1, 2.2], gap="small")
+    
     with col_menu:
-        st.markdown("#### Menu")
-        for cat in set([p['category'] for p in product_records]):
+        st.markdown("##### Categories")
+        for cat in sorted(list(set([p['category'] for p in product_records]))):
             if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
-                st.session_state.update({"selected_menu": cat, "product_page": 0})
+                st.session_state.selected_menu = cat
                 st.rerun()
 
     with col_items:
         current_cat = st.session_state.get("selected_menu", "Nuts")
-        st.markdown(f"#### {current_cat}")
+        st.markdown(f"##### {current_cat}")
         filtered = [p for p in product_records if p['category'] == current_cat]
         
         if filtered:
-            per_page = 5
-            total_pages = max(1, (len(filtered) + per_page - 1) // per_page)
-            if st.session_state.product_page >= total_pages: st.session_state.product_page = 0
-            
-            for idx, prod in enumerate(filtered[st.session_state.product_page * per_page : (st.session_state.product_page + 1) * per_page]):
+            for idx, prod in enumerate(filtered):
                 q_key = f"qty_{current_cat}_{idx}"
                 if q_key not in st.session_state.quantities: st.session_state.quantities[q_key] = 1
                 
                 with st.container(border=True):
-                    st.markdown(f"**{prod['name']}** — **₹{prod['price']}**")
-                    q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
-                    with q_m:
-                        if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
-                            st.session_state.quantities[q_key] -= 1; st.rerun()
-                    with q_d: st.markdown(f"<div style='text-align:center;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
-                    with q_p:
-                        if st.button("+", key=f"p_{q_key}", use_container_width=True):
-                            st.session_state.quantities[q_key] += 1; st.rerun()
+                    ic1, ic2 = st.columns([2, 1.3], gap="small")
+                    with ic1:
+                        st.markdown(f"**{prod['name']}**<br><span style='color:#e11d48;'>₹{prod['price']}</span>", unsafe_allow_html=True)
+                    with ic2:
+                        q_m, q_d, q_p = st.columns([1, 1, 1], gap="small")
+                        with q_m:
+                            if st.button("-", key=f"m_{q_key}", use_container_width=True) and st.session_state.quantities[q_key] > 1:
+                                st.session_state.quantities[q_key] -= 1; st.rerun()
+                        with q_d: st.markdown(f"<div style='text-align:center; font-weight:800;'>{st.session_state.quantities[q_key]}</div>", unsafe_allow_html=True)
+                        with q_p:
+                            if st.button("+", key=f"p_{q_key}", use_container_width=True):
+                                st.session_state.quantities[q_key] += 1; st.rerun()
                     
                     if st.button("Add to Cart", key=f"add_{q_key}", use_container_width=True):
                         st.session_state.cart.append({"product": prod['name'], "quantity": f"{st.session_state.quantities[q_key]} Units"})
                         st.success("Added!")
                         st.rerun()
-            
-            if total_pages > 1:
-                p_prev, p_inf, p_nxt = st.columns([1, 2, 1], gap="small")
-                with p_prev:
-                    if st.button("⬅ Prev", use_container_width=True) and st.session_state.product_page > 0:
-                        st.session_state.product_page -= 1; st.rerun()
-                with p_inf: st.markdown(f"<p style='text-align:center;'>Page {st.session_state.product_page + 1}/{total_pages}</p>", unsafe_allow_html=True)
-                with p_nxt:
-                    if st.button("Next ➡", use_container_width=True) and st.session_state.product_page < total_pages - 1:
-                        st.session_state.product_page += 1; st.rerun()
         else:
             st.info("No items found.")
 else:
