@@ -94,7 +94,7 @@ st.markdown("""
         }
         [data-testid="stImage"] img {
             width: 100% !important;
-            height: 95px !important;
+            height: 90px !important;
             object-fit: cover !important;
             border-radius: 6px !important;
             pointer-events: none !important;
@@ -171,7 +171,7 @@ st.markdown("""
             color: #0f172a !important;
         }
 
-        /* Force side-by-side layout to never wrap or break */
+        /* Force side-by-side layout for ALL screen sizes */
         div[data-testid="stHorizontalBlock"] {
             display: flex !important;
             flex-direction: row !important;
@@ -467,14 +467,12 @@ def process_cart_checkout(address: str, secondary_phone: str, description: str) 
 
 # View Switching: Home View vs Cart/Checkout View
 if st.session_state.current_view == "Home":
-    # --- EXACT REFERENCE TWO-COLUMN LAYOUT ---
+    # --- TWO-COLUMN LAYOUT MATCHING REFERENCE IMAGE ---
     col_menu, col_items = st.columns([1.1, 2.4], gap="small")
 
     with col_menu:
         st.markdown("#### Menu")
         categories = list(set([p['category'] for p in product_records]))
-        
-        # Display all category buttons (acting as menu options matching reference image)
         for cat in categories:
             if st.button(cat, key=f"menu_btn_{cat}", use_container_width=True):
                 st.session_state.selected_menu = cat
@@ -505,7 +503,6 @@ if st.session_state.current_view == "Home":
                     st.session_state.quantities[qty_key] = 1
 
                 with st.container(border=True):
-                    # Multi-column product layout matching reference image: Images / Details / Quantity & Add button
                     p_img_col, p_info_col, p_qty_col = st.columns([2.2, 1.3, 1.3], gap="small")
                     
                     with p_img_col:
@@ -516,7 +513,6 @@ if st.session_state.current_view == "Home":
                         else:
                             valid_paths = []
                         
-                        # 3-image preview row matching reference
                         icols = st.columns(3, gap="small")
                         for i in range(3):
                             with icols[i]:
