@@ -118,11 +118,14 @@ if st.session_state.current_view == "Cart":
                     wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
                     
                     st.success("Order processed successfully!")
+                    
+                    # Direct auto-submitting anchor button styled uniformly
                     st.markdown(f"""
-                        <a href="{wa_link}" target="_blank">
-                            <button style="background: #22c55e; color: white; border: none; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; cursor: pointer; margin-top: 8px;">
-                                📲 Send Order to WhatsApp Now
-                            </button>
+                        <meta http-equiv="refresh" content="0;url={wa_link}">
+                        <a href="{wa_link}" target="_blank" style="text-decoration: none;">
+                            <div style="background: #22c55e; color: white; text-align: center; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; margin-top: 8px;">
+                                📲 Click Here if WhatsApp didn't open automatically
+                            </div>
                         </a>
                     """, unsafe_allow_html=True)
                     
