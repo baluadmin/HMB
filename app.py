@@ -1,3 +1,4 @@
+import base64
 from datetime import datetime
 import os
 import pandas as pd
@@ -5,9 +6,12 @@ import urllib.parse
 import requests
 import streamlit as st
 
-st.set_page_config(page_title="HMB Nuts & Spices", page_icon="🥜", layout="centered")
+st.set_page_config(
+    page_title="HMB Nuts & Spices", page_icon="🥜", layout="centered"
+)
 
-st.markdown("""
+st.markdown(
+    """
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
@@ -52,330 +56,485 @@ st.markdown("""
             padding-right: 4px;
             margin-top: 6px;
         }
+
+        .product-img-box {
+            width: 100%;
+            height: 110px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .product-img-box img {
+            width: 100% !important;
+            height: 110px !important;
+            object-fit: cover !important;
+            border-radius: 6px;
+        }
     </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
 GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1NgLmYl63JP3Qz7iq3bWbe6of4OAsRwyUIyXL66rqdJRNJPX8oK6RoKUuz2evHxC3lA/exec"
 OWNER_PHONE_NUMBER = "9840450113"
 
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+  st.session_state.logged_in = False
 if "username" not in st.session_state:
-    st.session_state.username = ""
+  st.session_state.username = ""
 if "mobile" not in st.session_state:
-    st.session_state.mobile = ""
-if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
-    st.session_state.cart = []
+  st.session_state.mobile = ""
+if "cart" not in st.session_state or not isinstance(
+    st.session_state.cart, list
+):
+  st.session_state.cart = []
 if "search_query" not in st.session_state:
-    st.session_state.search_query = ""
+  st.session_state.search_query = ""
 if "current_view" not in st.session_state:
-    st.session_state.current_view = "Shop"
+  st.session_state.current_view = "Shop"
 
 # --- LOGIN PAGE ---
 if not st.session_state.logged_in:
-    st.markdown("### 🥜 HMB Nuts & Spices - Login")
-    st.markdown("Please enter your details to continue to the shop.")
-    
-    u_name = st.text_input("Username:")
-    m_num = st.text_input("Mobile Number:", max_chars=10, placeholder="Enter 10-digit number")
-    
-    if st.button("Login to Shop", use_container_width=True):
-        if not u_name.strip() or not m_num.strip():
-            st.warning("Please enter both username and mobile number.")
-        elif not m_num.isdigit() or len(m_num) != 10:
-            st.warning("Please enter a valid 10-digit mobile number containing only numbers.")
-        else:
-            st.session_state.logged_in = True
-            st.session_state.username = u_name.strip()
-            st.session_state.mobile = m_num.strip()
-            
-            try:
-                payload = {
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "username": u_name.strip(),
-                    "mobile": m_num.strip()
-                }
-                requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
-            except Exception:
-                pass
-            
-            st.rerun()
-    st.stop()
+  st.markdown("### 🥜 HMB Nuts & Spices - Login")
+  st.markdown("Please enter your details to continue to the shop.")
+
+  u_name = st.text_input("Username:")
+  m_num = st.text_input(
+      "Mobile Number:", max_chars=10, placeholder="Enter 10-digit number"
+  )
+
+  if st.button("Login to Shop", use_container_width=True):
+    if not u_name.strip() or not m_num.strip():
+      st.warning("Please enter both username and mobile number.")
+    elif not m_num.isdigit() or len(m_num) != 10:
+      st.warning(
+          "Please enter a valid 10-digit mobile number containing only numbers."
+      )
+    else:
+      st.session_state.logged_in = True
+      st.session_state.username = u_name.strip()
+      st.session_state.mobile = m_num.strip()
+
+      try:
+        payload = {
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "username": u_name.strip(),
+            "mobile": m_num.strip(),
+        }
+        requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
+      except Exception:
+        pass
+
+      st.rerun()
+  st.stop()
+
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
-    try:
-        if NEW_GOOGLE_SHEET_CSV_URL:
-            df = pd.read_csv(NEW_GOOGLE_SHEET_CSV_URL)
-            df.to_csv("inventory.csv", index=False)
-            return df
-        else:
-            return pd.read_csv("inventory.csv") if os.path.exists("inventory.csv") else pd.DataFrame()
-    except Exception:
-        return pd.read_csv("inventory.csv") if os.path.exists("inventory.csv") else pd.DataFrame()
+  try:
+    if NEW_GOOGLE_SHEET_CSV_URL:
+      df = pd.read_csv(NEW_GOOGLE_SHEET_CSV_URL)
+      df.to_csv("inventory.csv", index=False)
+      return df
+    else:
+      return (
+          pd.read_csv("inventory.csv")
+          if os.path.exists("inventory.csv")
+          else pd.DataFrame()
+      )
+  except Exception:
+    return (
+        pd.read_csv("inventory.csv")
+        if os.path.exists("inventory.csv")
+        else pd.DataFrame()
+    )
+
 
 inv_df = load_shop_inventory()
 product_records = []
 if not inv_df.empty:
-    for _, row in inv_df.iterrows():
-        if len(row) > 4 and pd.notna(row.iloc[0]) and pd.notna(row.iloc[1]) and str(row.iloc[0]).strip() != "id":
-            img_val = str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
-            product_records.append({
-                "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]).strip(),
-                "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
-                "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "1 Pack",
-                "image": img_val
-            })
+  for _, row in inv_df.iterrows():
+    if (
+        len(row) > 4
+        and pd.notna(row.iloc[0])
+        and pd.notna(row.iloc[1])
+        and str(row.iloc[0]).strip() != "id"
+    ):
+      img_val = (
+          str(row.iloc[6]).strip()
+          if len(row) > 6 and pd.notna(row.iloc[6])
+          else ""
+      )
+      product_records.append({
+          "id": str(row.iloc[0]),
+          "name": str(row.iloc[1]),
+          "category": str(row.iloc[2]).strip(),
+          "stock": str(row.iloc[3]),
+          "price": str(row.iloc[4]),
+          "description": (
+              str(row.iloc[5]).strip()
+              if len(row) > 5 and pd.notna(row.iloc[5])
+              else "1 Pack"
+          ),
+          "image": img_val,
+      })
 
 if not product_records:
-    product_records = [
-        {"id": "ITM001", "name": "Premium California Almonds", "price": "850", "stock": "50", "category": "Nuts", "image": "", "description": "500g"},
-        {"id": "ITM002", "name": "W320 Cashew Nuts", "price": "900", "stock": "40", "category": "Nuts", "image": "", "description": "500g"},
-        {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "250g"}
-    ]
+  product_records = [
+      {
+          "id": "ITM001",
+          "name": "Premium California Almonds",
+          "price": "850",
+          "stock": "50",
+          "category": "Nuts",
+          "image": "",
+          "description": "500g",
+      },
+      {
+          "id": "ITM002",
+          "name": "W320 Cashew Nuts",
+          "price": "900",
+          "stock": "40",
+          "category": "Nuts",
+          "image": "",
+          "description": "500g",
+      },
+      {
+          "id": "ITM003",
+          "name": "Raw Pumpkin Seeds",
+          "price": "350",
+          "stock": "100",
+          "category": "Seeds",
+          "image": "",
+          "description": "250g",
+      },
+  ]
 
 if st.session_state.current_view == "Cart":
-    st.markdown("### Your Shopping Cart & Checkout")
-    
-    if not isinstance(st.session_state.cart, list):
-        st.session_state.cart = []
+  st.markdown("### Your Shopping Cart & Checkout")
 
-    if st.session_state.cart:
-        for idx, item in enumerate(st.session_state.cart):
-            c1, c2 = st.columns([3, 1], gap="small")
-            with c1:
-                st.markdown(f"- **{item.get('product', 'Item')}** ({item.get('quantity', '1 Unit')})")
-            with c2:
-                if st.button("Remove", key=f"rem_{idx}", use_container_width=True):
-                    st.session_state.cart.pop(idx)
-                    st.rerun()
-        
-        st.markdown("<hr style='margin: 8px 0;'>", unsafe_allow_html=True)
-        st.markdown("### Secure Checkout Form")
-        
-        with st.form("checkout_form"):
-            delivery_address = st.text_area("Delivery Address:")
-            alt_contact = st.text_input("Alternative Contact Number:", value=st.session_state.mobile)
-            custom_desc = st.text_area("Product Specifications / Custom Description:")
-            
-            submitted = st.form_submit_button("Complete Order", use_container_width=True)
-            if submitted:
-                if delivery_address.strip() and alt_contact.strip():
-                    cart_summary = ", ".join([f"{i.get('quantity', '1 Unit')} of {i.get('product', 'Item')}" for i in st.session_state.cart])
-                    
-                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
-                    encoded_message = urllib.parse.quote(wa_message)
-                    wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
-                    
-                    st.markdown(f"""
+  if not isinstance(st.session_state.cart, list):
+    st.session_state.cart = []
+
+  if st.session_state.cart:
+    for idx, item in enumerate(st.session_state.cart):
+      c1, c2 = st.columns([3, 1], gap="small")
+      with c1:
+        st.markdown(
+            f"- **{item.get('product', 'Item')}**"
+            f" ({item.get('quantity', '1 Unit')})"
+        )
+      with c2:
+        if st.button("Remove", key=f"rem_{idx}", use_container_width=True):
+          st.session_state.cart.pop(idx)
+          st.rerun()
+
+    st.markdown("<hr style='margin: 8px 0;'>", unsafe_allow_html=True)
+    st.markdown("### Secure Checkout Form")
+
+    with st.form("checkout_form"):
+      delivery_address = st.text_area("Delivery Address:")
+      alt_contact = st.text_input(
+          "Alternative Contact Number:", value=st.session_state.mobile
+      )
+      custom_desc = st.text_area("Product Specifications / Custom Description:")
+
+      submitted = st.form_submit_button(
+          "Complete Order", use_container_width=True
+      )
+      if submitted:
+        if delivery_address.strip() and alt_contact.strip():
+          cart_summary = ", ".join([
+              f"{i.get('quantity', '1 Unit')} of {i.get('product', 'Item')}"
+              for i in st.session_state.cart
+          ])
+
+          wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+          encoded_message = urllib.parse.quote(wa_message)
+          wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
+
+          st.markdown(
+              f"""
                         <a href="{wa_link}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                             <div style="background: #22c55e; color: white; text-align: center; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 12px; width: 100%; margin-top: 8px; cursor: pointer;">
                                 📲 Tap Here to Send Order to WhatsApp Now
                             </div>
                         </a>
-                    """, unsafe_allow_html=True)
-                    
-                    st.session_state.cart = []
-                    st.session_state.search_query = ""
-                else:
-                    st.warning("Please fill in both the delivery address and alternative contact number.")
-        
-        if st.button("Return to Shop", use_container_width=True):
-            st.session_state.search_query = ""
-            st.session_state.current_view = "Shop"
-            st.rerun()
-    else:
-        st.info("Your cart is empty.")
-        if st.button("Back to Shop", use_container_width=True):
-            st.session_state.search_query = ""
-            st.session_state.current_view = "Shop"
-            st.rerun()
+                    """,
+              unsafe_allow_html=True,
+          )
+
+          st.session_state.cart = []
+          st.session_state.search_query = ""
+        else:
+          st.warning(
+              "Please fill in both the delivery address and alternative contact"
+              " number."
+          )
+
+    if st.button("Return to Shop", use_container_width=True):
+      st.session_state.search_query = ""
+      st.session_state.current_view = "Shop"
+      st.rerun()
+  else:
+    st.info("Your cart is empty.")
+    if st.button("Back to Shop", use_container_width=True):
+      st.session_state.search_query = ""
+      st.session_state.current_view = "Shop"
+      st.rerun()
 
 else:
-    st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
-    
-    top_col1, top_col2, top_col3 = st.columns([1.8, 1.1, 1.1], gap="small")
-    with top_col1:
-        if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
-            st.session_state.current_view = "Shop"
-            st.session_state.search_query = ""
-            st.rerun()
-    with top_col2:
-        if not isinstance(st.session_state.cart, list):
-            st.session_state.cart = []
-        cart_count = len(st.session_state.cart)
-        if st.button(f"🛒 Cart ({cart_count})", key="cart_btn", use_container_width=True):
-            st.session_state.current_view = "Cart"
-            st.rerun()
-    with top_col3:
-        if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
-            st.session_state.logged_in = False
-            st.session_state.username = ""
-            st.session_state.mobile = ""
-            st.session_state.cart = []
-            st.rerun()
+  st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
 
-    st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+  top_col1, top_col2, top_col3 = st.columns([1.8, 1.1, 1.1], gap="small")
+  with top_col1:
+    if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
+      st.session_state.current_view = "Shop"
+      st.session_state.search_query = ""
+      st.rerun()
+  with top_col2:
+    if not isinstance(st.session_state.cart, list):
+      st.session_state.cart = []
+    cart_count = len(st.session_state.cart)
+    if st.button(
+        f"🛒 Cart ({cart_count})", key="cart_btn", use_container_width=True
+    ):
+      st.session_state.current_view = "Cart"
+      st.rerun()
+  with top_col3:
+    if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
+      st.session_state.logged_in = False
+      st.session_state.username = ""
+      st.session_state.mobile = ""
+      st.session_state.cart = []
+      st.rerun()
 
-    srch_c1, srch_c2 = st.columns([4, 1], gap="small")
-    with srch_c1:
-        search_query = st.text_input(
-            "Search", 
-            value=st.session_state.search_query, 
-            placeholder="🔍 Search dry fruits, nuts, seeds...", 
-            label_visibility="collapsed"
-        )
-    with srch_c2:
-        if st.button("Clear", key="clear_search_btn", use_container_width=True):
-            st.session_state.search_query = ""
-            st.rerun()
+  st.markdown(
+      "<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid"
+      " #e2e8f0;'>",
+      unsafe_allow_html=True,
+  )
 
-    if search_query != st.session_state.search_query:
-        st.session_state.search_query = search_query
-        st.rerun()
+  srch_c1, srch_c2 = st.columns([4, 1], gap="small")
+  with srch_c1:
+    search_query = st.text_input(
+        "Search",
+        value=st.session_state.search_query,
+        placeholder="🔍 Search dry fruits, nuts, seeds...",
+        label_visibility="collapsed",
+    )
+  with srch_c2:
+    if st.button("Clear", key="clear_search_btn", use_container_width=True):
+      st.session_state.search_query = ""
+      st.rerun()
 
-    active_query = st.session_state.search_query.strip().lower()
+  if search_query != st.session_state.search_query:
+    st.session_state.search_query = search_query
+    st.rerun()
 
-    def get_matching_products(query, products):
-        if not query:
-            return products
-        exact_matches = []
-        fuzzy_matches = []
-        for p in products:
-            name_lower = p['name'].lower()
-            cat_lower = p['category'].lower()
-            if query in name_lower or query in cat_lower:
-                exact_matches.append(p)
-            else:
-                query_chars = set(query)
-                name_chars = set(name_lower)
-                common_chars = query_chars.intersection(name_chars)
-                if len(common_chars) >= max(1, len(query_chars) - 2):
-                    fuzzy_matches.append(p)
-        seen_ids = set()
-        final_list = []
-        for p in exact_matches + fuzzy_matches:
-            if p['id'] not in seen_ids:
-                seen_ids.add(p['id'])
-                final_list.append(p)
-        return final_list
+  active_query = st.session_state.search_query.strip().lower()
 
-    matching_suggestions = []
-    if active_query:
-        matching_suggestions = get_matching_products(active_query, product_records)
 
-    if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
-        st.markdown("""
+  def get_matching_products(query, products):
+    if not query:
+      return products
+    exact_matches = []
+    fuzzy_matches = []
+    for p in products:
+      name_lower = p["name"].lower()
+      cat_lower = p["category"].lower()
+      if query in name_lower or query in cat_lower:
+        exact_matches.append(p)
+      else:
+        query_chars = set(query)
+        name_chars = set(name_lower)
+        common_chars = query_chars.intersection(name_chars)
+        if len(common_chars) >= max(1, len(query_chars) - 2):
+          fuzzy_matches.append(p)
+    seen_ids = set()
+    final_list = []
+    for p in exact_matches + fuzzy_matches:
+      if p["id"] not in seen_ids:
+        seen_ids.add(p["id"])
+        final_list.append(p)
+    return final_list
+
+
+  matching_suggestions = []
+  if active_query:
+    matching_suggestions = get_matching_products(active_query, product_records)
+
+  if (
+      matching_suggestions
+      and active_query != matching_suggestions[0]["name"].lower()
+  ):
+    st.markdown(
+        """
             <div style="max-height: 200px; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-        """, unsafe_allow_html=True)
-        
-        for idx, prod in enumerate(matching_suggestions[:10]):
-            sug_col1, sug_col2 = st.columns([1, 6], gap="small")
-            with sug_col1:
-                st.markdown("""
+        """,
+        unsafe_allow_html=True,
+    )
+
+    for idx, prod in enumerate(matching_suggestions[:10]):
+      sug_col1, sug_col2 = st.columns([1, 6], gap="small")
+      with sug_col1:
+        st.markdown(
+            """
                     <div style="background: #f1f5f9; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
-                """, unsafe_allow_html=True)
-            with sug_col2:
-                if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
-                    st.session_state.search_query = prod['name']
-                    st.rerun()
-                
-        st.markdown("</div>", unsafe_allow_html=True)
+                """,
+            unsafe_allow_html=True,
+        )
+      with sug_col2:
+        if st.button(prod["name"], key=f"dropdown_sug_{idx}", use_container_width=True):
+          st.session_state.search_query = prod["name"]
+          st.rerun()
 
-    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    if not active_query:
-        filtered_products = product_records
-    else:
-        filtered_products = get_matching_products(active_query, product_records)
+  st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('<div class="scrollable-catalog" id="product-catalog-box">', unsafe_allow_html=True)
+  if not active_query:
+    filtered_products = product_records
+  else:
+    filtered_products = get_matching_products(active_query, product_records)
 
-    def get_cart_qty(prod_name):
-        for item in st.session_state.cart:
-            if item.get('product') == prod_name:
-                q_str = str(item.get('quantity', '1 Unit')).split()[0]
-                return int(q_str) if q_str.isdigit() else 1
-        return 0
+  st.markdown(
+      '<div class="scrollable-catalog" id="product-catalog-box">',
+      unsafe_allow_html=True,
+  )
 
-    if filtered_products:
-        for i in range(0, len(filtered_products), 2):
-            cols = st.columns(2, gap="small")
-            for j in range(2):
-                if i + j < len(filtered_products):
-                    prod = filtered_products[i + j]
-                    idx = i + j
-                    
-                    raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
-                    base_price = float(raw_price_str) if raw_price_str else 0.0
-                    
-                    img_path = f"images/{prod['image']}" if prod['image'] and os.path.exists(f"images/{prod['image']}") else ""
-                    
-                    with cols[j]:
-                        with st.container(border=True):
-                            if img_path:
-                                st.image(img_path, use_container_width=True)
-                            else:
-                                st.markdown(
-                                    """
-                                    <div style="background: #f1f5f9; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 3px;">
+
+  def get_cart_qty(prod_name):
+    for item in st.session_state.cart:
+      if item.get("product") == prod_name:
+        q_str = str(item.get("quantity", "1 Unit")).split()[0]
+        return int(q_str) if q_str.isdigit() else 1
+    return 0
+
+
+  if filtered_products:
+    for i in range(0, len(filtered_products), 2):
+      cols = st.columns(2, gap="small")
+      for j in range(2):
+        if i + j < len(filtered_products):
+          prod = filtered_products[i + j]
+          idx = i + j
+
+          raw_price_str = "".join(
+              [c for c in str(prod["price"]) if c.isdigit() or c == "."]
+          )
+          base_price = float(raw_price_str) if raw_price_str else 0.0
+
+          img_path = (
+              f"images/{prod['image']}"
+              if prod["image"] and os.path.exists(f"images/{prod['image']}")
+              else ""
+          )
+
+          with cols[j]:
+            with st.container(border=True):
+              if img_path:
+                try:
+                  with open(img_path, "rb") as img_file:
+                    encoded_img = base64.b64encode(img_file.read()).decode()
+                  st.markdown(
+                      f"""
+                                        <div class="product-img-box">
+                                            <img src="data:image/jpeg;base64,{encoded_img}" alt="{prod['name']}">
+                                        </div>
+                                        """,
+                      unsafe_allow_html=True,
+                  )
+                except Exception:
+                  st.markdown(
+                      """
+                                        <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
+                                            📦 IMG
+                                        </div>
+                                        """,
+                      unsafe_allow_html=True,
+                  )
+              else:
+                st.markdown(
+                    """
+                                    <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
                                         📦 IMG
                                     </div>
                                     """,
-                                    unsafe_allow_html=True
-                                )
-                            
-                            st.markdown(
-                                f"""
+                    unsafe_allow_html=True,
+                )
+
+              st.markdown(
+                  f"""
                                 <div style="background: #ffffff; border-radius: 6px;">
                                     <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
                                     <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 8px; margin-top: 1px;">{prod['description']}</div>
                                     <div style="font-weight: 900; font-size: 11px; color: #0f172a; margin-top: 3px;">₹{int(base_price)}</div>
                                 </div>
-                                """, 
-                                unsafe_allow_html=True
-                            )
-                            
-                            current_qty = get_cart_qty(prod['name'])
-                            
-                            if current_qty == 0:
-                                if st.button("ADD +", key=f"add_init_{idx}", use_container_width=True):
-                                    if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
-                                        st.session_state.cart = []
-                                    st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
-                                    st.rerun()
-                            else:
-                                p_c1, p_c2, p_c3, p_c4 = st.columns([1, 1, 1, 1.2], gap="small")
-                                with p_c1:
-                                    if st.button("-", key=f"minus_{idx}", use_container_width=True):
-                                        for item_i, cart_item in enumerate(st.session_state.cart):
-                                            if cart_item.get('product') == prod['name']:
-                                                q_str = str(cart_item.get('quantity', '1')).split()[0]
-                                                q_val = int(q_str) if q_str.isdigit() else 1
-                                                if q_val > 1:
-                                                    st.session_state.cart[item_i]['quantity'] = f"{q_val - 1} Unit"
-                                                else:
-                                                    st.session_state.cart.pop(item_i)
-                                                break
-                                        st.rerun()
-                                with p_c2:
-                                    st.markdown(f"<div style='text-align: center; font-weight: 900; font-size: 11px; padding-top: 6px;'>{current_qty}</div>", unsafe_allow_html=True)
-                                with p_c3:
-                                    if st.button("+", key=f"plus_{idx}", use_container_width=True):
-                                        for item_i, cart_item in enumerate(st.session_state.cart):
-                                            if cart_item.get('product') == prod['name']:
-                                                q_str = str(cart_item.get('quantity', '1')).split()[0]
-                                                q_val = int(q_str) if q_str.isdigit() else 1
-                                                st.session_state.cart[item_i]['quantity'] = f"{q_val + 1} Unit"
-                                                break
-                                        st.rerun()
-                                with p_c4:
-                                    if st.button("Cart", key=f"gotocart_btn_{idx}", use_container_width=True):
-                                        st.session_state.current_view = "Cart"
-                                        st.rerun()
-    else:
-        st.info("No items found.")
+                                """,
+                  unsafe_allow_html=True,
+              )
 
-    st.markdown('</div>', unsafe_allow_html=True)
+              current_qty = get_cart_qty(prod["name"])
+
+              if current_qty == 0:
+                if st.button("ADD +", key=f"add_init_{idx}", use_container_width=True):
+                  if "cart" not in st.session_state or not isinstance(
+                      st.session_state.cart, list
+                  ):
+                    st.session_state.cart = []
+                  st.session_state.cart.append({
+                      "product": prod["name"],
+                      "quantity": "1 Unit",
+                  })
+                  st.rerun()
+              else:
+                p_c1, p_c2, p_c3, p_c4 = st.columns(
+                    [1, 1, 1, 1.2], gap="small"
+                )
+                with p_c1:
+                  if st.button("-", key=f"minus_{idx}", use_container_width=True):
+                    for item_i, cart_item in enumerate(st.session_state.cart):
+                      if cart_item.get("product") == prod["name"]:
+                        q_str = str(cart_item.get("quantity", "1")).split()[0]
+                        q_val = int(q_str) if q_str.isdigit() else 1
+                        if q_val > 1:
+                          st.session_state.cart[item_i]["quantity"] = (
+                              f"{q_val - 1} Unit"
+                          )
+                        else:
+                          st.session_state.cart.pop(item_i)
+                        break
+                    st.rerun()
+                with p_c2:
+                  st.markdown(
+                      f"<div style='text-align: center; font-weight: 900;"
+                      f" font-size: 11px; padding-top:"
+                      f" 6px;'>{current_qty}</div>",
+                      unsafe_allow_html=True,
+                  )
+                with p_c3:
+                  if st.button("+", key=f"plus_{idx}", use_container_width=True):
+                    for item_i, cart_item in enumerate(st.session_state.cart):
+                      if cart_item.get("product") == prod["name"]:
+                        q_str = str(cart_item.get("quantity", "1")).split()[0]
+                        q_val = int(q_str) if q_str.isdigit() else 1
+                        st.session_state.cart[item_i]["quantity"] = (
+                            f"{q_val + 1} Unit"
+                        )
+                        break
+                    st.rerun()
+                with p_c4:
+                  if st.button("Cart", key=f"gotocart_btn_{idx}", use_container_width=True):
+                    st.session_state.current_view = "Cart"
+                    st.rerun()
+  else:
+    st.info("No items found.")
+
+  st.markdown("</div>", unsafe_allow_html=True)
