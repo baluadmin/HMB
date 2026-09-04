@@ -526,7 +526,7 @@ else:
                             ):
                                 found = False
                                 for item_i, cart_item in enumerate(st.session_state.cart):
-                                    if cart_item.get("product": prod["name"]):
+                                    if cart_item.get("product") == prod["name"]:
                                         q_str = str(cart_item.get("quantity", "1")).split()[0]
                                         q_val = int(q_str) if q_str.isdigit() else 1
                                         st.session_state.cart[item_i]["quantity"] = (
