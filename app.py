@@ -36,7 +36,7 @@ st.markdown(
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 6px !important; padding: 4px 2px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 6px !important; padding: 3px 1px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -576,7 +576,7 @@ else:
                                     st.markdown(
                                         f"<div style='text-align: center; font-weight: 900;"
                                         f" font-size: 11px; padding-top:"
-                                        f" 6px;'>{current_qty}</div>",
+                                        f" 4px;'>{current_qty}</div>",
                                         unsafe_allow_html=True,
                                     )
                                 with p_c3:
@@ -584,7 +584,7 @@ else:
                                         "+", key=f"plus_{idx}", use_container_width=True
                                     ):
                                         for item_i, cart_item in enumerate(st.session_state.cart):
-                                            if cart_item.get("product") == prod["name"]:
+                                            if cart_item.get("product`") == prod["name"] or cart_item.get("product") == prod["name"]:
                                                 q_str = str(cart_item.get("quantity", "1")).split()[0]
                                                 q_val = int(q_str) if q_str.isdigit() else 1
                                                 st.session_state.cart[item_i]["quantity"] = (
