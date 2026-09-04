@@ -74,7 +74,7 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 90px;
+            height: 140px;
             background: #f1f5f9;
             border-radius: 6px;
             display: flex;
@@ -487,10 +487,10 @@ else:
                                 except Exception:
                                     st.markdown(
                                         """
-                                                <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
-                                                    📦 IMG
-                                                </div>
-                                                """,
+                                        <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
+                                            📦 IMG
+                                        </div>
+                                        """,
                                         unsafe_allow_html=True,
                                     )
                             else:
@@ -545,7 +545,7 @@ else:
                                 if st.button(
                                     "+", key=f"plus_{idx}", use_container_width=True
                                 ):
-                                    found = False
+                                    found = false_flag = False
                                     for item_i, cart_item in enumerate(st.session_state.cart):
                                         if cart_item.get("product") == prod["name"]:
                                             q_str = str(cart_item.get("quantity", "1")).split()[0]
