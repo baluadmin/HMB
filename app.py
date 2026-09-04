@@ -86,7 +86,7 @@ st.markdown(
         .product-img-box img {
             width: 100% !important;
             height: 100% !important;
-            object-fit: cover !important;
+            object-fit: contain !important;
             border-radius: 6px;
         }
 
