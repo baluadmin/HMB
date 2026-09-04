@@ -25,7 +25,6 @@ st.markdown("""
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Prevent Streamlit columns from stacking on mobile screens */
         [data-testid="column"] {
             width: 50% !important;
             flex: 1 1 50% !important;
@@ -38,7 +37,6 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Pinned sticky header that stays locked at the top */
         .sticky-header {
             position: sticky !important;
             top: 0px !important;
@@ -48,7 +46,6 @@ st.markdown("""
             margin: 0px !important;
         }
 
-        /* Independent scrollable product catalog wrapper with separate scrolling */
         .scrollable-catalog {
             max-height: calc(100vh - 150px) !important;
             overflow-y: auto !important;
@@ -60,14 +57,53 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
+GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1NgLmYl63JP3Qz7iq3bWbe6of4OAsRwyUIyXL66rqdJRNJPX8oK6RoKUuz2evHxC3lA/exec"
 OWNER_PHONE_NUMBER = "9840450113"
 
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "username" not in st.session_state:
+    st.session_state.username = ""
+if "mobile" not in st.session_state:
+    st.session_state.mobile = ""
 if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 if "search_query" not in st.session_state:
     st.session_state.search_query = ""
 if "current_view" not in st.session_state:
     st.session_state.current_view = "Shop"
+
+# --- LOGIN PAGE ---
+if not st.session_state.logged_in:
+    st.markdown("### 🥜 HMB Nuts & Spices - Login")
+    st.markdown("Please enter your details to continue to the shop.")
+    
+    with st.form("login_form"):
+        u_name = st.text_input("Username:")
+        m_num = st.text_input("Mobile Number:")
+        login_submitted = st.form_submit_button("Login to Shop", use_container_width=True)
+        
+        if login_submitted:
+            if u_name.strip() and m_num.strip():
+                st.session_state.logged_in = True
+                st.session_state.username = u_name.strip()
+                st.session_state.mobile = m_num.strip()
+                
+                # Send login data to Google Sheet via Web App API
+                try:
+                    payload = {
+                        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "username": u_name.strip(),
+                        "mobile": m_num.strip()
+                    }
+                    requests.post(GOOGLE_SCRIPT_WEB_APP_URL, json=payload, timeout=5)
+                except Exception:
+                    pass
+                
+                st.rerun()
+            else:
+                st.warning("Please enter both username and mobile number.")
+    st.stop()
 
 @st.cache_data(ttl=2)
 def load_shop_inventory():
@@ -121,7 +157,7 @@ if st.session_state.current_view == "Cart":
         
         with st.form("checkout_form"):
             delivery_address = st.text_area("Delivery Address:")
-            alt_contact = st.text_input("Alternative Contact Number:")
+            alt_contact = st.text_input("Alternative Contact Number:", value=st.session_state.mobile)
             custom_desc = st.text_area("Product Specifications / Custom Description:")
             
             submitted = st.form_submit_button("Complete Order", use_container_width=True)
@@ -129,7 +165,7 @@ if st.session_state.current_view == "Cart":
                 if delivery_address.strip() and alt_contact.strip():
                     cart_summary = ", ".join([f"{i.get('quantity', '1 Unit')} of {i.get('product', 'Item')}" for i in st.session_state.cart])
                     
-                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
                     wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
                     
@@ -158,7 +194,6 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -242,14 +277,13 @@ else:
                 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if not active_query:
         filtered_products = product_records
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Completely Independent Scrollable Product Catalog Viewport Wrapper
     st.markdown('<div class="scrollable-catalog" id="product-catalog-box">', unsafe_allow_html=True)
 
     if filtered_products:
@@ -282,7 +316,6 @@ else:
                                 unsafe_allow_html=True
                             )
                             
-                            # Two separate side-by-side action buttons: ADD and Cart
                             btn_c1, btn_c2 = st.columns(2, gap="small")
                             with btn_c1:
                                 if st.button("ADD", key=f"add_btn_{idx}", use_container_width=True):
@@ -298,4 +331,4 @@ else:
     else:
         st.info("No items found.")
 
-    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
+    st.markdown('</div>', unsafe_allow_html=True)
