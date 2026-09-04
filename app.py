@@ -26,14 +26,13 @@ st.markdown("""
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         [data-testid="column"] {
-            width: 50% !important;
-            flex: 1 1 50% !important;
-            min-width: 50% !important;
+            flex: 1 1 0% !important;
+            min-width: 0px !important;
         }
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 6px !important; padding: 4px 2px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -195,13 +194,20 @@ if st.session_state.current_view == "Cart":
 else:
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
-    top_col1, top_col2 = st.columns([3, 1], gap="small")
+    top_col1, top_col2, top_col3 = st.columns([1.8, 1.1, 1.1], gap="small")
     with top_col1:
-        if st.button("🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True):
+        if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
             st.session_state.current_view = "Shop"
             st.session_state.search_query = ""
             st.rerun()
     with top_col2:
+        if not isinstance(st.session_state.cart, list):
+            st.session_state.cart = []
+        cart_count = len(st.session_state.cart)
+        if st.button(f"🛒 Cart ({cart_count})", key="cart_btn", use_container_width=True):
+            st.session_state.current_view = "Cart"
+            st.rerun()
+    with top_col3:
         if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.username = ""
