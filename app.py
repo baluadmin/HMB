@@ -202,11 +202,11 @@ else:
             st.session_state.search_query = ""
             st.rerun()
     with top_col2:
-        if not isinstance(st.session_state.cart, list):
+        if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
+            st.session_state.logged_in = False
+            st.session_state.username = ""
+            st.session_state.mobile = ""
             st.session_state.cart = []
-        cart_count = len(st.session_state.cart)
-        if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
-            st.session_state.current_view = "Cart"
             st.rerun()
 
     st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
@@ -285,11 +285,9 @@ else:
 
     st.markdown('<div class="scrollable-catalog" id="product-catalog-box">', unsafe_allow_html=True)
 
-    # Helper function to find item quantity in cart
     def get_cart_qty(prod_name):
         for item in st.session_state.cart:
             if item.get('product') == prod_name:
-                # Extract number from quantity string e.g. "2 Unit" -> 2
                 q_str = str(item.get('quantity', '1 Unit')).split()[0]
                 return int(q_str) if q_str.isdigit() else 1
         return 0
