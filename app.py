@@ -252,34 +252,6 @@ if not product_records:
         },
     ]
 
-st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
-
-top_col1, top_col2 = st.columns([2, 1], gap="small")
-with top_col1:
-    if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
-        st.session_state.current_view = "Shop"
-        st.session_state.search_query = ""
-        st.query_params["view"] = "Shop"
-        st.rerun()
-with top_col2:
-    if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
-        st.session_state.logged_in = False
-        st.session_state.username = ""
-        st.session_state.mobile = ""
-        st.session_state.cart = []
-        st.session_state.current_view = "Shop"
-        if "view" in st.query_params:
-            del st.query_params["view"]
-        st.rerun()
-
-st.markdown(
-    "<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid"
-    " #e2e8f0;'>",
-    unsafe_allow_html=True,
-)
-
-st.markdown("</div>", unsafe_allow_html=True)
-
 if not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 
