@@ -15,7 +15,13 @@ st.markdown(
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f0fdf4 !important; color: #0f172a !important; }
+        
+        /* Force global light blue background and dark text on the entire page */
+        html, body, [class*="css"], .stApp { 
+            font-family: 'Mulish', sans-serif !important; 
+            background-color: #e0f2fe !important; 
+            color: #0f172a !important; 
+        }
         
         .block-container { 
             padding-top: 0rem !important; 
@@ -26,6 +32,7 @@ st.markdown(
             max-width: 480px !important; 
             margin-left: auto; 
             margin-right: auto; 
+            background-color: #e0f2fe !important;
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
@@ -59,7 +66,7 @@ st.markdown(
             position: sticky !important;
             top: 0px !important;
             z-index: 999999 !important;
-            background-color: #f0fdf4 !important;
+            background-color: #e0f2fe !important;
             padding: 8px 4px 4px 4px !important;
             margin: 0px !important;
         }
