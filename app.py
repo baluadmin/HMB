@@ -310,21 +310,34 @@ else:
                     raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
                     base_price = float(raw_price_str) if raw_price_str else 0.0
                     
-                    img_path = f"images/{prod['image']}" if prod['image'] and os.path.exists(f"images/{prod['image']}") else ""
+                    # Handle multiple images separated by comma or space
+                    img_filenames = [img.strip() for img in prod['image'].replace(',', ' ').split() if img.strip()]
+                    valid_img_paths = [f"images/{img_name}" for img_name in img_filenames if os.path.exists(f"images/{img_name}")]
                     
                     with cols[j]:
                         with st.container(border=True):
-                            if img_path:
-                                st.image(img_path, use_container_width=True)
+                            st.markdown(
+                                '<div style="height: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 4px;">',
+                                unsafe_allow_html=True
+                            )
+                            if valid_img_paths:
+                                if len(valid_img_paths) == 1:
+                                    st.image(valid_img_paths[0], use_container_width=True)
+                                else:
+                                    img_cols = st.columns(len(valid_img_paths), gap="small")
+                                    for img_idx, img_path in enumerate(valid_img_paths):
+                                        with img_cols[img_idx]:
+                                            st.image(img_path, use_container_width=True)
                             else:
                                 st.markdown(
                                     """
-                                    <div style="background: #f1f5f9; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 3px;">
+                                    <div style="background: #f1f5f9; width: 100%; height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800;">
                                         📦 IMG
                                     </div>
                                     """,
                                     unsafe_allow_html=True
                                 )
+                            st.markdown('</div>', unsafe_allow_html=True)
                             
                             st.markdown(
                                 f"""
