@@ -20,7 +20,7 @@ st.markdown(
         .block-container { 
             padding-top: 0rem !important; 
             margin-top: 0rem !important; 
-            padding-bottom: 0.4rem !important; 
+            padding-bottom: 5rem !important; 
             padding-left: 0.4rem !important; 
             padding-right: 0.4rem !important; 
             max-width: 480px !important; 
@@ -50,7 +50,7 @@ st.markdown(
         }
 
         .scrollable-catalog {
-            max-height: calc(100vh - 150px) !important;
+            max-height: calc(100vh - 180px) !important;
             overflow-y: auto !important;
             -webkit-overflow-scrolling: touch;
             padding-right: 4px;
@@ -75,6 +75,26 @@ st.markdown(
             height: auto !important;
             object-fit: contain !important;
             border-radius: 6px;
+        }
+
+        /* Fixed Bottom Bar Container */
+        .fixed-bottom-bar {
+            position: fixed !important;
+            bottom: 0px !important;
+            left: 0px !important;
+            right: 0px !important;
+            width: 100% !important;
+            max-width: 480px !important;
+            margin: 0 auto !important;
+            background-color: #ffffff !important;
+            border-top: 1px solid #e2e8f0 !important;
+            padding: 10px 16px !important;
+            z-index: 99999999 !important;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.06) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            box-sizing: border-box !important;
         }
     </style>
 """,
@@ -250,17 +270,28 @@ st.markdown(
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- FIXED BOTTOM-LEFT FLOATING CART BUTTON (Stable during scrolling) ---
+# --- FIXED BOTTOM STICKY BAR FOR CART ---
 if not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 
 cart_count = len(st.session_state.cart)
 if cart_count > 0 and st.session_state.current_view == "Shop":
+    total_qty = 0
+    for item in st.session_state.cart:
+        q_str = str(item.get("quantity", "1")).split()[0]
+        total_qty += int(q_str) if q_str.isdigit() else 1
+
     st.markdown(
         f"""
-        <a href="?view=Cart" target="_self" style="position: fixed !important; bottom: 20px !important; left: 20px !important; z-index: 99999999 !important; background: #2563eb !important; color: #ffffff !important; padding: 12px 20px !important; border-radius: 30px !important; font-weight: 900 !important; font-size: 13px !important; text-decoration: none !important; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4) !important; display: flex !important; align-items: center !important; gap: 8px !important;">
-            🛒 View Cart ({cart_count})
-        </a>
+        <div class="fixed-bottom-bar">
+            <div>
+                <div style="font-size: 11px; font-weight: 800; color: #64748b;">{total_qty} Item(s) in Cart</div>
+                <div style="font-size: 13px; font-weight: 900; color: #0f172a;">Ready to Checkout</div>
+            </div>
+            <a href="?view=Cart" target="_self" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 900; font-size: 12px; text-decoration: none; display: inline-block; text-align: center;">
+                View Cart 🛒
+            </a>
+        </div>
         """,
         unsafe_allow_html=True,
     )
