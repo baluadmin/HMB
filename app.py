@@ -541,57 +541,50 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
-                            if current_qty == 0:
+                            p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
+                            with p_c1:
                                 if st.button(
-                                    "ADD +", key=f"add_init_{idx}", use_container_width=True
+                                    "-", key=f"minus_{idx}", use_container_width=True
                                 ):
-                                    if "cart" not in st.session_state or not isinstance(
-                                        st.session_state.cart, list
-                                    ):
-                                        st.session_state.cart = []
-                                    st.session_state.cart.append({
-                                        "product": prod["name"],
-                                        "quantity": "1 Unit",
-                                    })
-                                    st.rerun()
-                            else:
-                                p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
-                                with p_c1:
-                                    if st.button(
-                                        "-", key=f"minus_{idx}", use_container_width=True
-                                    ):
-                                        for item_i, cart_item in enumerate(st.session_state.cart):
-                                            if cart_item.get("product") == prod["name"]:
-                                                q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                                q_val = int(q_str) if q_str.isdigit() else 1
-                                                if q_val > 1:
-                                                    st.session_state.cart[item_i]["quantity"] = (
-                                                        f"{q_val - 1} Unit"
-                                                    )
-                                                else:
-                                                    st.session_state.cart.pop(item_i)
-                                                break
-                                        st.rerun()
-                                with p_c2:
-                                    st.markdown(
-                                        f"<div style='text-align: center; font-weight: 900;"
-                                        f" font-size: 11px; padding-top:"
-                                        f" 4px;'>{current_qty}</div>",
-                                        unsafe_allow_html=True,
-                                    )
-                                with p_c3:
-                                    if st.button(
-                                        "+", key=f"plus_{idx}", use_container_width=True
-                                    ):
-                                        for item_i, cart_item in enumerate(st.session_state.cart):
-                                            if cart_item.get("product`") == prod["name"] or cart_item.get("product") == prod["name"]:
-                                                q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                                q_val = int(q_str) if q_str.isdigit() else 1
+                                    for item_i, cart_item in enumerate(st.session_state.cart):
+                                        if cart_item.get("product") == prod["name"]:
+                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
+                                            q_val = int(q_str) if q_str.isdigit() else 1
+                                            if q_val > 1:
                                                 st.session_state.cart[item_i]["quantity"] = (
-                                                    f"{q_val + 1} Unit"
+                                                    f"{q_val - 1} Unit"
                                                 )
-                                                break
-                                        st.rerun()
+                                            else:
+                                                st.session_state.cart.pop(item_i)
+                                            break
+                                    st.rerun()
+                            with p_c2:
+                                st.markdown(
+                                    f"<div style='text-align: center; font-weight: 900;"
+                                    f" font-size: 11px; padding-top:"
+                                    f" 4px;'>{current_qty}</div>",
+                                    unsafe_allow_html=True,
+                                )
+                            with p_c3:
+                                if st.button(
+                                    "+", key=f"plus_{idx}", use_container_width=True
+                                ):
+                                    found = False
+                                    for item_i, cart_item in enumerate(st.session_state.cart):
+                                        if cart_item.get("product") == prod["name"]:
+                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
+                                            q_val = int(q_str) if q_str.isdigit() else 1
+                                            st.session_state.cart[item_i]["quantity"] = (
+                                                f"{q_val + 1} Unit"
+                                            )
+                                            found = True
+                                            break
+                                    if not found:
+                                        st.session_state.cart.append({
+                                            "product": prod["name"],
+                                            "quantity": "1 Unit",
+                                        })
+                                    st.rerun()
     else:
         st.info("No items found.")
 
