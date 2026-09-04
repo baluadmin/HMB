@@ -29,22 +29,16 @@ st.markdown(
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Force 3 columns inline side-by-side inside the product card */
-        .row-widget.stHorizontal {
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 4px !important;
-        }
-
+        /* Force 3 inline columns side-by-side cleanly */
         [data-testid="column"] {
             flex: 1 1 0% !important;
             min-width: 0px !important;
         }
 
+        /* Make quantity control buttons very small and compact */
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px 0px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 4px !important; padding: 1px 0px !important; min-height: 22px !important; height: 22px !important; width: 100% !important; white-space: nowrap !important; line-height: 1 !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -549,7 +543,7 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
-                            # Force horizontal 3 columns layout for [- | qty | +] on mobile via inline flex overriding
+                            # Horizontal inline counter layout (- | count | +) with compact button sizing
                             p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
                             with p_c1:
                                 if st.button(
@@ -571,7 +565,7 @@ else:
                                 st.markdown(
                                     f"<div style='text-align: center; font-weight: 900;"
                                     f" font-size: 11px; padding-top:"
-                                    f" 6px;'>{current_qty}</div>",
+                                    f" 4px;'>{current_qty}</div>",
                                     unsafe_allow_html=True,
                                 )
                             with p_c3:
