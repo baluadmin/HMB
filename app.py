@@ -34,7 +34,7 @@ st.markdown("""
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -112,7 +112,7 @@ if st.session_state.current_view == "Cart":
             with c1:
                 st.markdown(f"- **{item.get('product', 'Item')}** ({item.get('quantity', '1 Unit')})")
             with c2:
-                if st.button("Remove Item", key=f"rem_{idx}", use_container_width=True):
+                if st.button("Remove", key=f"rem_{idx}", use_container_width=True):
                     st.session_state.cart.pop(idx)
                     st.rerun()
         
@@ -250,7 +250,7 @@ else:
         filtered_products = get_matching_products(active_query, product_records)
 
     # Completely Independent Scrollable Product Catalog Viewport Wrapper
-    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
+    st.markdown('<div class="scrollable-catalog" id="product-catalog-box">', unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -282,12 +282,19 @@ else:
                                 unsafe_allow_html=True
                             )
                             
-                            if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
-                                if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
-                                    st.session_state.cart = []
-                                st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
-                                st.success("Added!")
-                                st.rerun()
+                            # Two separate side-by-side action buttons: ADD and Cart
+                            btn_c1, btn_c2 = st.columns(2, gap="small")
+                            with btn_c1:
+                                if st.button("ADD", key=f"add_btn_{idx}", use_container_width=True):
+                                    if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
+                                        st.session_state.cart = []
+                                    st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
+                                    st.success("Added!")
+                                    st.rerun()
+                            with btn_c2:
+                                if st.button("Cart", key=f"goto_cart_{idx}", use_container_width=True):
+                                    st.session_state.current_view = "Cart"
+                                    st.rerun()
     else:
         st.info("No items found.")
 
