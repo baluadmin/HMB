@@ -59,7 +59,7 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 160px;
+            height: 120px;
             background: #f1f5f9;
             border-radius: 6px;
             display: flex;
@@ -70,7 +70,7 @@ st.markdown(
         }
         .product-img-box img {
             max-width: 100% !important;
-            max-height: 160px !important;
+            max-height: 120px !important;
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
