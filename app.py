@@ -11,17 +11,19 @@ st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; overflow: hidden !important; }
         
         .block-container { 
             padding-top: 0rem !important; 
             margin-top: 0rem !important; 
-            padding-bottom: 0.4rem !important; 
+            padding-bottom: 0rem !important; 
             padding-left: 0.4rem !important; 
             padding-right: 0.4rem !important; 
             max-width: 480px !important; 
             margin-left: auto; 
             margin-right: auto; 
+            height: 100vh !important;
+            overflow: hidden !important;
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
@@ -37,25 +39,28 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Permanently locked fixed header container */
+        /* Completely locked non-moving header container */
         .sticky-header {
-            position: fixed !important;
+            position: absolute !important;
             top: 0px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
+            left: 0px !important;
+            right: 0px !important;
             width: 100% !important;
             max-width: 480px !important;
+            margin: 0 auto !important;
             z-index: 999999 !important;
             background-color: #f8fafc !important;
             padding: 10px 10px 6px 10px !important;
             box-sizing: border-box !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* Isolated scrollable product catalog wrapper with precise top clearance */
+        /* Strictly isolated independent scrollable area for products only */
         .scrollable-catalog {
-            margin-top: 140px !important;
-            max-height: calc(100vh - 150px) !important;
+            position: absolute !important;
+            top: 135px !important;
+            bottom: 10px !important;
+            left: 0.4rem !important;
+            right: 0.4rem !important;
             overflow-y: auto !important;
             padding-right: 2px;
         }
