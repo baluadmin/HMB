@@ -53,7 +53,7 @@ st.markdown("""
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
 OWNER_PHONE_NUMBER = "9840450113"
 
-if "cart" not in st.session_state:
+if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 if "search_query" not in st.session_state:
     st.session_state.search_query = ""
@@ -94,11 +94,14 @@ if not product_records:
 if st.session_state.current_view == "Cart":
     st.markdown("### Your Shopping Cart & Checkout")
     
+    if not isinstance(st.session_state.cart, list):
+        st.session_state.cart = []
+
     if st.session_state.cart:
         for idx, item in enumerate(st.session_state.cart):
             c1, c2 = st.columns([3, 1], gap="small")
             with c1:
-                st.markdown(f"- **{item['product']}** ({item['quantity']})")
+                st.markdown(f"- **{item.get('product', 'Item')}** ({item.get('quantity', '1 Unit')})")
             with c2:
                 if st.button("Remove Item", key=f"rem_{idx}", use_container_width=True):
                     st.session_state.cart.pop(idx)
@@ -115,7 +118,7 @@ if st.session_state.current_view == "Cart":
             submitted = st.form_submit_button("Complete Order", use_container_width=True)
             if submitted:
                 if delivery_address.strip() and alt_contact.strip():
-                    cart_summary = ", ".join([f"{i['quantity']} of {i['product']}" for i in st.session_state.cart])
+                    cart_summary = ", ".join([f"{i.get('quantity', '1 Unit')} of {i.get('product', 'Item')}" for i in st.session_state.cart])
                     
                     wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
@@ -156,6 +159,8 @@ else:
             st.session_state.search_query = ""
             st.rerun()
     with top_col2:
+        if not isinstance(st.session_state.cart, list):
+            st.session_state.cart = []
         cart_count = len(st.session_state.cart)
         if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
             st.session_state.current_view = "Cart"
@@ -271,6 +276,8 @@ else:
                             )
                             
                             if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
+                                if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
+                                    st.session_state.cart = []
                                 st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
                                 st.success("Added!")
                                 st.rerun()
