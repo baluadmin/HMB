@@ -13,8 +13,7 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        /* Fixed top margin to prevent content from cutting off under the browser edge */
-        .block-container { padding-top: 0.5rem !important; margin-top: 0rem !important; padding-bottom: 0rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        .block-container { padding-top: 0.4rem !important; margin-top: 0rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,14 +29,16 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Properly spaced sticky top header with safe top offset */
+        /* Lock the header and search section firmly to the top of the viewport */
         .fixed-header {
             position: sticky;
             top: 0px;
-            z-index: 999;
+            z-index: 99999;
             background-color: #f8fafc;
-            padding-top: 6px;
-            padding-bottom: 2px;
+            padding-top: 4px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 8px;
         }
 
         div[data-testid="stVerticalBlock"] {
@@ -146,7 +147,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Fixed Sticky Header Container
+    # Begin the sticky header container wrapper
     st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -161,7 +162,7 @@ else:
             st.session_state.current_view = "Cart"
             st.rerun()
 
-    st.markdown("<hr style='margin: 2px 0 4px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
     srch_c1, srch_c2 = st.columns([4, 1], gap="small")
     with srch_c1:
@@ -212,7 +213,7 @@ else:
 
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
         st.markdown("""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 2px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
         """, unsafe_allow_html=True)
         
         for idx, prod in enumerate(matching_suggestions[:6]):
@@ -228,7 +229,7 @@ else:
                 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True) # End fixed-header div
+    st.markdown('</div>', unsafe_allow_html=True) # Close the fixed-header sticky container wrapper
 
     if not active_query:
         filtered_products = product_records
