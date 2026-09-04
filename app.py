@@ -13,8 +13,17 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        /* Pushed flush to the top edge */
-        .block-container { padding-top: 0rem !important; margin-top: 0rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        /* Flush layout configuration */
+        .block-container { 
+            padding-top: 0rem !important; 
+            margin-top: 0rem !important; 
+            padding-bottom: 0.4rem !important; 
+            padding-left: 0.4rem !important; 
+            padding-right: 0.4rem !important; 
+            max-width: 480px !important; 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,7 +39,7 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Permanently locked fixed top header and search bar container */
+        /* True independent fixed header container */
         .sticky-header {
             position: fixed !important;
             top: 0px !important;
@@ -38,18 +47,18 @@ st.markdown("""
             transform: translateX(-50%) !important;
             width: 100% !important;
             max-width: 480px !important;
-            z-index: 99999 !important;
+            z-index: 999999 !important;
             background-color: #f8fafc !important;
-            padding: 8px 10px 4px 10px !important;
+            padding: 10px 10px 6px 10px !important;
             box-sizing: border-box !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* Scrollable product catalog viewport wrapper with top spacing for fixed header */
+        /* Completely isolated scrollable product catalog wrapper */
         .scrollable-catalog {
-            margin-top: 130px !important;
-            max-height: calc(100vh - 140px);
-            overflow-y: auto;
+            margin-top: 135px !important;
+            height: calc(100vh - 145px) !important;
+            overflow-y: auto !important;
             padding-right: 2px;
         }
     </style>
@@ -154,7 +163,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Fixed Top Header Container wrapping Shop Name, Cart Button, and Search Bar
+    # Completely Fixed Top Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -245,7 +254,7 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Scrollable container wrapper for products catalog
+    # Completely Independent Scrollable Product Catalog Viewport Wrapper
     st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
