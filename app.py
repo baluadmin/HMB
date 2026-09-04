@@ -29,6 +29,7 @@ st.markdown(
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
+        /* Force 3 columns per row on mobile for counter controls */
         [data-testid="column"] {
             flex: 1 1 0% !important;
             min-width: 0px !important;
@@ -36,7 +37,7 @@ st.markdown(
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 6px !important; padding: 3px 1px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 6px !important; padding: 2px 0px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -541,6 +542,7 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
+                            # Always render as a compact 3-column horizontal control (- | count | +)
                             p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
                             with p_c1:
                                 if st.button(
