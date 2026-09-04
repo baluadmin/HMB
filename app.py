@@ -91,14 +91,14 @@ if not st.session_state.logged_in:
             st.session_state.username = u_name.strip()
             st.session_state.mobile = m_num.strip()
             
-            # Send login data to Google Sheet via Web App API
+            # Send login data to Google Sheet via GET parameters to prevent redirect issues
             try:
                 payload = {
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     "username": u_name.strip(),
                     "mobile": m_num.strip()
                 }
-                requests.post(GOOGLE_SCRIPT_WEB_APP_URL, json=payload, timeout=5)
+                requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
             except Exception:
                 pass
             
