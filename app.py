@@ -439,7 +439,6 @@ else:
                     )
 
                     with cols[j]:
-                        # Removed Streamlit container border box wrapper completely
                         if img_path:
                             try:
                                 with open(img_path, "rb") as img_file:
