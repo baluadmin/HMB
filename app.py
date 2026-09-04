@@ -29,16 +29,24 @@ st.markdown(
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Narrow down columns specifically for compact quantity controls */
-        [data-testid="column"] {
-            flex: 1 1 0% !important;
-            min-width: 0px !important;
+        /* Force counter columns and elements strictly into one single horizontal row */
+        div[data-testid="stHorizontalBlock"] {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 4px !important;
         }
 
-        /* Highly compact button styling to reduce width */
+        [data-testid="column"] {
+            flex: 1 1 auto !important;
+            min-width: 0px !important;
+            width: auto !important;
+        }
+
+        /* Extremely compact button sizing for single-line fit */
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 4px !important; padding: 1px 0px !important; min-height: 20px !important; height: 20px !important; width: 60px !important; margin: 0 auto !important; display: block !important; white-space: nowrap !important; line-height: 1 !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 4px !important; padding: 0px !important; min-height: 24px !important; height: 24px !important; width: 32px !important; min-width: 32px !important; margin: 0 auto !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; white-space: nowrap !important; line-height: 1 !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -543,8 +551,8 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
-                            # Narrow horizontal layout for [- | count | +] with custom CSS button widths
-                            p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
+                            # Force strict single-line horizontal alignment for [- | count | +]
+                            p_c1, p_c2, p_c3 = st.columns([1.2, 1, 1.2], gap="small")
                             with p_c1:
                                 if st.button(
                                     "-", key=f"minus_{idx}", use_container_width=True
@@ -564,8 +572,7 @@ else:
                             with p_c2:
                                 st.markdown(
                                     f"<div style='text-align: center; font-weight: 900;"
-                                    f" font-size: 11px; padding-top:"
-                                    f" 3px;'>{current_qty}</div>",
+                                    f" font-size: 11px; line-height: 24px;'>{current_qty}</div>",
                                     unsafe_allow_html=True,
                                 )
                             with p_c3:
