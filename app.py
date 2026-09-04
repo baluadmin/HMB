@@ -15,7 +15,7 @@ st.markdown(
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f0fdf4 !important; color: #0f172a !important; }
         
         .block-container { 
             padding-top: 0rem !important; 
@@ -59,7 +59,7 @@ st.markdown(
             position: sticky !important;
             top: 0px !important;
             z-index: 999999 !important;
-            background-color: #f8fafc !important;
+            background-color: #f0fdf4 !important;
             padding: 8px 4px 4px 4px !important;
             margin: 0px !important;
         }
@@ -74,8 +74,8 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 120px;
-            background: #f1f5f9;
+            height: 140px;
+            background: transparent !important;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -87,6 +87,7 @@ st.markdown(
             width: 100% !important;
             height: 100% !important;
             object-fit: contain !important;
+            background: transparent !important;
             border-radius: 6px;
         }
 
@@ -118,12 +119,6 @@ NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OV
 GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1NgLmYl63JP3Qz7iq3bWbe6of4OAsRwyUIyXL66rqdJRNJPX8oK6RoKUuz2evHxC3lA/exec"
 OWNER_PHONE_NUMBER = "9840450113"
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
-if "mobile" not in st.session_state:
-    st.session_state.mobile = ""
 if "cart" not in st.session_state or not isinstance(
     st.session_state.cart, list
 ):
@@ -135,40 +130,6 @@ if "current_view" not in st.session_state:
 
 if "view" in st.query_params:
     st.session_state.current_view = st.query_params["view"]
-
-if not st.session_state.logged_in:
-    st.markdown("### 🥜 HMB Nuts & Spices - Login")
-    st.markdown("Please enter your details to continue to the shop.")
-
-    u_name = st.text_input("Username:")
-    m_num = st.text_input(
-        "Mobile Number:", max_chars=10, placeholder="Enter 10-digit number"
-    )
-
-    if st.button("Login to Shop", use_container_width=True):
-        if not u_name.strip() or not m_num.strip():
-            st.warning("Please enter both username and mobile number.")
-        elif not m_num.isdigit() or len(m_num) != 10:
-            st.warning(
-                "Please enter a valid 10-digit mobile number containing only numbers."
-            )
-        else:
-            st.session_state.logged_in = True
-            st.session_state.username = u_name.strip()
-            st.session_state.mobile = m_num.strip()
-
-            try:
-                payload = {
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "username": u_name.strip(),
-                    "mobile": m_num.strip(),
-                }
-                requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
-            except Exception:
-                pass
-
-            st.rerun()
-    st.stop()
 
 
 @st.cache_data(ttl=2)
@@ -302,7 +263,7 @@ if st.session_state.current_view == "Cart":
         with st.form("checkout_form"):
             delivery_address = st.text_area("Delivery Address:")
             alt_contact = st.text_input(
-                "Alternative Contact Number:", value=st.session_state.mobile
+                "Alternative Contact Number:", value=""
             )
             custom_desc = st.text_area("Product Specifications / Custom Description:")
 
@@ -316,7 +277,7 @@ if st.session_state.current_view == "Cart":
                         for i in st.session_state.cart
                     ])
 
-                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
                     wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
 
@@ -505,12 +466,12 @@ else:
 
                             st.markdown(
                                 f"""
-                                <div style="background: #ffffff; border-radius: 6px;">
+                                <div style="background: transparent !important; border-radius: 6px;">
                                     <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
+                                    <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: inherit; line-height: 1.1;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 8px; margin-top: 1px;">{prod['description']}</div>
                                     <div style="color: #059669; font-size: 9px; font-weight: 800; margin-top: 2px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 11px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-weight: 900; font-size: 11px; color: inherit; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """,
                                 unsafe_allow_html=True,
