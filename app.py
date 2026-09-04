@@ -91,7 +91,7 @@ if not st.session_state.logged_in:
             st.session_state.username = u_name.strip()
             st.session_state.mobile = m_num.strip()
             
-            # Send login data to Google Sheet via GET parameters to prevent redirect issues
+            # Send login data to Google Sheet via GET parameters
             try:
                 payload = {
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -296,7 +296,6 @@ else:
                     
                     raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
                     base_price = float(raw_price_str) if raw_price_str else 0.0
-                    mrp_price = int(base_price * 1.1)
                     
                     with cols[j]:
                         with st.container(border=True):
@@ -309,8 +308,7 @@ else:
                                     <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
                                     <div style="font-weight: 900; font-size: 10px; height: 28px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 9px; margin-top: 1px;">{prod['description']}</div>
-                                    <div style="color: #059669; font-size: 9px; font-weight: 800; margin-top: 2px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 12px; color: #0f172a; margin-top: 1px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-weight: 900; font-size: 12px; color: #0f172a; margin-top: 4px;">₹{int(base_price)}</div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
