@@ -69,9 +69,11 @@ st.markdown(
             margin-bottom: 6px;
         }
         .product-img-box img {
-            width: 100% !important;
-            height: 110px !important;
-            object-fit: cover !important;
+            max-width: 100% !important;
+            max-height: 110px !important;
+            width: auto !important;
+            height: auto !important;
+            object-fit: contain !important;
             border-radius: 6px;
         }
     </style>
