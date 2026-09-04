@@ -13,8 +13,8 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        /* Pushed flush to the top edge and removed default spacing */
-        .block-container { padding-top: 0rem !important; margin-top: -1.5rem !important; padding-bottom: 0rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        /* Fixed top margin to prevent content from cutting off under the browser edge */
+        .block-container { padding-top: 0.5rem !important; margin-top: 0rem !important; padding-bottom: 0rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,17 +30,16 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Compact sticky top header */
+        /* Properly spaced sticky top header with safe top offset */
         .fixed-header {
             position: sticky;
-            top: 0;
+            top: 0px;
             z-index: 999;
             background-color: #f8fafc;
-            padding-top: 2px;
-            padding-bottom: 0px;
+            padding-top: 6px;
+            padding-bottom: 2px;
         }
 
-        /* Reduce vertical gaps inside metric/container blocks */
         div[data-testid="stVerticalBlock"] {
             gap: 0.2rem !important;
         }
@@ -147,7 +146,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Compact Sticky Header Container
+    # Fixed Sticky Header Container
     st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
