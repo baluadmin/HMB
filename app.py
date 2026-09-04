@@ -11,19 +11,17 @@ st.markdown("""
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; overflow: hidden !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
         .block-container { 
             padding-top: 0rem !important; 
             margin-top: 0rem !important; 
-            padding-bottom: 0rem !important; 
+            padding-bottom: 1rem !important; 
             padding-left: 0.4rem !important; 
             padding-right: 0.4rem !important; 
             max-width: 480px !important; 
             margin-left: auto; 
             margin-right: auto; 
-            height: 100vh !important;
-            overflow: hidden !important;
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
@@ -39,30 +37,15 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Completely locked non-moving header container */
+        /* Sticky header that stays pinned at the top during smooth page scrolling */
         .sticky-header {
-            position: absolute !important;
+            position: sticky !important;
             top: 0px !important;
-            left: 0px !important;
-            right: 0px !important;
-            width: 100% !important;
-            max-width: 480px !important;
-            margin: 0 auto !important;
             z-index: 999999 !important;
             background-color: #f8fafc !important;
-            padding: 10px 10px 6px 10px !important;
-            box-sizing: border-box !important;
-        }
-
-        /* Strictly isolated independent scrollable area for products only */
-        .scrollable-catalog {
-            position: absolute !important;
-            top: 135px !important;
-            bottom: 10px !important;
-            left: 0.4rem !important;
-            right: 0.4rem !important;
-            overflow-y: auto !important;
-            padding-right: 2px;
+            padding: 8px 4px 6px 4px !important;
+            margin: 0px !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
     </style>
 """, unsafe_allow_html=True)
@@ -166,7 +149,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Completely Fixed Top Header Container wrapping Shop Name, Cart Button, and Search Bar
+    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -257,8 +240,7 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Completely Independent Scrollable Product Catalog Viewport Wrapper
-    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
+    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -298,5 +280,3 @@ else:
                                 st.rerun()
     else:
         st.info("No items found.")
-
-    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
