@@ -79,10 +79,14 @@ if not st.session_state.logged_in:
     st.markdown("Please enter your details to continue to the shop.")
     
     u_name = st.text_input("Username:")
-    m_num = st.text_input("Mobile Number:")
+    m_num = st.text_input("Mobile Number:", max_chars=10, placeholder="Enter 10-digit number")
     
     if st.button("Login to Shop", use_container_width=True):
-        if u_name.strip() and m_num.strip():
+        if not u_name.strip() or not m_num.strip():
+            st.warning("Please enter both username and mobile number.")
+        elif not m_num.isdigit() or len(m_num) != 10:
+            st.warning("Please enter a valid 10-digit mobile number containing only numbers.")
+        else:
             st.session_state.logged_in = True
             st.session_state.username = u_name.strip()
             st.session_state.mobile = m_num.strip()
@@ -99,8 +103,6 @@ if not st.session_state.logged_in:
                 pass
             
             st.rerun()
-        else:
-            st.warning("Please enter both username and mobile number.")
     st.stop()
 
 @st.cache_data(ttl=2)
