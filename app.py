@@ -15,7 +15,7 @@ st.markdown(
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
-        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
+        html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; color: #0f172a !important; }
         
         .block-container { 
             padding-top: 0rem !important; 
@@ -75,7 +75,7 @@ st.markdown(
         .product-img-box {
             width: 100%;
             height: 140px;
-            background: #ffffff;
+            background: transparent !important;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -87,7 +87,7 @@ st.markdown(
             width: 100% !important;
             height: 100% !important;
             object-fit: contain !important;
-            background-color: #ffffff !important;
+            background: transparent !important;
             border-radius: 6px;
         }
 
@@ -466,12 +466,12 @@ else:
 
                             st.markdown(
                                 f"""
-                                <div style="background: #ffffff; border-radius: 6px;">
+                                <div style="background: transparent !important; border-radius: 6px;">
                                     <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
+                                    <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: inherit; line-height: 1.1;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 8px; margin-top: 1px;">{prod['description']}</div>
                                     <div style="color: #059669; font-size: 9px; font-weight: 800; margin-top: 2px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 11px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-weight: 900; font-size: 11px; color: inherit; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """,
                                 unsafe_allow_html=True,
@@ -480,49 +480,6 @@ else:
                             current_qty = get_cart_qty(prod["name"])
 
                             p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
-                            with p_c1:
-                                if st.button(
-                                    "-", key=f"minus_{idx}", use_container_width=True
-                                ):
-                                    for item_i, cart_item in enumerate(st.session_state.cart):
-                                        if cart_item.get("product") == prod["name"]:
-                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                            q_val = int(q_str) if q_str.isdigit() else 1
-                                            if q_val > 1:
-                                                st.session_state.cart[item_i]["quantity"] = (
-                                                    f"{q_val - 1} Unit"
-                                                )
-                                            else:
-                                                st.session_state.cart.pop(item_i)
-                                            break
-                                    st.rerun()
-                            with p_c2:
-                                st.markdown(
-                                    f"<div style='text-align: center; font-weight: 900;"
-                                    f" font-size: 13px; color: #db2777; line-height: 28px;'>{current_qty}</div>",
-                                    unsafe_allow_html=True,
-                                )
-                            with p_c3:
-                                if st.button(
-                                    "+", key=f"plus_{idx}", use_container_width=True
-                                ):
-                                    found = False
-                                    for item_i, cart_item in enumerate(st.session_state.cart):
-                                        if cart_item.get("product") == prod["name"]:
-                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                            q_val = int(q_str) if q_str.isdigit() else 1
-                                            st.session_state.cart[item_i]["quantity"] = (
-                                                f"{q_val + 1} Unit"
-                                            )
-                                            found = True
-                                            break
-                                    if not found:
-                                        st.session_state.cart.append({
-                                            "product": prod["name"],
-                                            "quantity": "1 Unit",
-                                        })
-                                    st.rer0n = True
-                                    st.rerun()
     else:
         st.info("No items found.")
 
