@@ -310,7 +310,7 @@ else:
                     raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
                     base_price = float(raw_price_str) if raw_price_str else 0.0
                     
-                    # Handle multiple images separated by comma or space
+                    # Handle multiple images safely
                     img_filenames = [img.strip() for img in prod['image'].replace(',', ' ').split() if img.strip()]
                     valid_img_paths = [f"images/{img_name}" for img_name in img_filenames if os.path.exists(f"images/{img_name}")]
                     
