@@ -34,7 +34,19 @@ st.markdown(
             margin-right: auto; 
             background-color: #e0f2fe !important;
         }
-        #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
+
+        /* Completely hide Streamlit headers, footers, main menus, and floating manage app buttons */
+        #MainMenu, header, footer, 
+        div[data-testid="stToolbar"], 
+        div[data-testid="stDecoration"], 
+        div[data-testid="manage-app-button"],
+        button[kind="header"] {
+            visibility: hidden !important; 
+            display: none !important; 
+            height: 0px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
 
         [data-testid="column"] {
             flex: 1 1 0% !important;
@@ -514,7 +526,7 @@ else:
                             ):
                                 found = False
                                 for item_i, cart_item in enumerate(st.session_state.cart):
-                                    if cart_item.get("product") == prod["name"]:
+                                    if cart_item.get("product": prod["name"]):
                                         q_str = str(cart_item.get("quantity", "1")).split()[0]
                                         q_val = int(q_str) if q_str.isdigit() else 1
                                         st.session_state.cart[item_i]["quantity"] = (
