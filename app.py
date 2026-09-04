@@ -13,7 +13,8 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        .block-container { padding-top: 0.4rem !important; margin-top: 0rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        /* Pushed flush to the top edge */
+        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -25,28 +26,26 @@ st.markdown("""
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 5px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Lock the header and search section firmly to the top of the viewport */
-        .fixed-header {
-            position: sticky;
-            top: 0px;
-            z-index: 99999;
-            background-color: #f8fafc;
-            padding-top: 4px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 8px;
+        /* Sticky top header and search bar container locked firmly in place */
+        .sticky-header {
+            position: sticky !important;
+            top: 0px !important;
+            z-index: 99999 !important;
+            background-color: #f8fafc !important;
+            padding-top: 10px !important;
+            padding-bottom: 6px !important;
+            margin-top: 0px !important;
         }
 
-        div[data-testid="stVerticalBlock"] {
-            gap: 0.2rem !important;
-        }
-        
-        div[data-testid="stContainer"] {
-            padding: 4px !important;
+        /* Scrollable product catalog viewport wrapper */
+        .scrollable-catalog {
+            max-height: 72vh;
+            overflow-y: auto;
+            padding-right: 2px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -105,7 +104,7 @@ if st.session_state.current_view == "Cart":
                     st.session_state.cart.pop(idx)
                     st.rerun()
         
-        st.markdown("<hr style='margin: 4px 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='margin: 8px 0;'>", unsafe_allow_html=True)
         st.markdown("### Secure Checkout Form")
         
         with st.form("checkout_form"):
@@ -124,7 +123,7 @@ if st.session_state.current_view == "Cart":
                     
                     st.markdown(f"""
                         <a href="{wa_link}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-                            <div style="background: #22c55e; color: white; text-align: center; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 10px; width: 100%; margin-top: 4px; cursor: pointer;">
+                            <div style="background: #22c55e; color: white; text-align: center; font-weight: 800; font-size: 13px; border-radius: 6px; padding: 12px; width: 100%; margin-top: 8px; cursor: pointer;">
                                 📲 Tap Here to Send Order to WhatsApp Now
                             </div>
                         </a>
@@ -147,8 +146,8 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Begin the sticky header container wrapper
-    st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
+    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
+    st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
     with top_col1:
@@ -162,7 +161,7 @@ else:
             st.session_state.current_view = "Cart"
             st.rerun()
 
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+    st.markdown("<hr style='margin: 4px 0 6px 0; border: none; border-top: 1px solid #e2e8f0;'>", unsafe_allow_html=True)
 
     srch_c1, srch_c2 = st.columns([4, 1], gap="small")
     with srch_c1:
@@ -213,14 +212,14 @@ else:
 
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
         st.markdown("""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
         """, unsafe_allow_html=True)
         
         for idx, prod in enumerate(matching_suggestions[:6]):
             sug_col1, sug_col2 = st.columns([1, 6], gap="small")
             with sug_col1:
                 st.markdown("""
-                    <div style="background: #f1f5f9; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; margin: 2px auto;">📦</div>
+                    <div style="background: #f1f5f9; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; margin: 4px auto;">📦</div>
                 """, unsafe_allow_html=True)
             with sug_col2:
                 if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
@@ -229,12 +228,17 @@ else:
                 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True) # Close the fixed-header sticky container wrapper
+    st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
+
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
     if not active_query:
         filtered_products = product_records
     else:
         filtered_products = get_matching_products(active_query, product_records)
+
+    # Scrollable container wrapper for products catalog
+    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -252,15 +256,15 @@ else:
                         with st.container(border=True):
                             st.markdown(
                                 f"""
-                                <div style="background: #ffffff; border-radius: 6px;">
-                                    <div style="background: #f1f5f9; height: 90px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 4px;">
+                                <div style="background: #ffffff; border-radius: 8px;">
+                                    <div style="background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
                                         📦 PRODUCT IMG
                                     </div>
-                                    <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 11px; height: 28px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
-                                    <div style="color: #64748b; font-size: 9px; margin-top: 1px;">{prod['description']}</div>
-                                    <div style="color: #059669; font-size: 9px; font-weight: 800; margin-top: 2px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 12px; color: #0f172a; margin-top: 1px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
+                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
+                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
+                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
@@ -272,3 +276,5 @@ else:
                                 st.rerun()
     else:
         st.info("No items found.")
+
+    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
