@@ -30,14 +30,15 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky top header and search bar container for stable scrolling */
+        /* Sticky top header and search bar container locked firmly in place */
         .sticky-header {
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            background-color: #f8fafc;
-            padding-top: 8px;
-            padding-bottom: 4px;
+            position: sticky !important;
+            top: 0px !important;
+            z-index: 99999 !important;
+            background-color: #f8fafc !important;
+            padding-top: 10px !important;
+            padding-bottom: 6px !important;
+            margin-top: 0px !important;
         }
 
         /* Scrollable product catalog viewport wrapper */
@@ -224,7 +225,7 @@ else:
                 if st.button(prod['name'], key=f"dropdown_sug_{idx}", use_container_width=True):
                     st.session_state.search_query = prod['name']
                     st.rerun()
-                    
+                
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
