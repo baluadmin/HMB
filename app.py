@@ -14,7 +14,7 @@ st.markdown("""
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
         /* Pushed flush to the top edge */
-        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        .block-container { padding-top: 0rem !important; margin-top: 0rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,20 +30,20 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky top header and search bar container locked firmly in place */
+        /* Locked sticky top header and search bar container */
         .sticky-header {
             position: sticky !important;
             top: 0px !important;
             z-index: 99999 !important;
             background-color: #f8fafc !important;
-            padding-top: 10px !important;
-            padding-bottom: 6px !important;
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
             margin-top: 0px !important;
         }
 
         /* Scrollable product catalog viewport wrapper */
         .scrollable-catalog {
-            max-height: 72vh;
+            max-height: 70vh;
             overflow-y: auto;
             padding-right: 2px;
         }
@@ -269,7 +269,7 @@ else:
                                     <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
                                     <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-title; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
