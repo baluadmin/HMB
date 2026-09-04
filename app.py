@@ -91,7 +91,6 @@ if not st.session_state.logged_in:
             st.session_state.username = u_name.strip()
             st.session_state.mobile = m_num.strip()
             
-            # Send login data to Google Sheet via GET parameters
             try:
                 payload = {
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -286,6 +285,15 @@ else:
 
     st.markdown('<div class="scrollable-catalog" id="product-catalog-box">', unsafe_allow_html=True)
 
+    # Helper function to find item quantity in cart
+    def get_cart_qty(prod_name):
+        for item in st.session_state.cart:
+            if item.get('product') == prod_name:
+                # Extract number from quantity string e.g. "2 Unit" -> 2
+                q_str = str(item.get('quantity', '1 Unit')).split()[0]
+                return int(q_str) if q_str.isdigit() else 1
+        return 0
+
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
             cols = st.columns(2, gap="small")
@@ -314,18 +322,37 @@ else:
                                 unsafe_allow_html=True
                             )
                             
-                            btn_c1, btn_c2 = st.columns(2, gap="small")
-                            with btn_c1:
-                                if st.button("ADD", key=f"add_btn_{idx}", use_container_width=True):
+                            current_qty = get_cart_qty(prod['name'])
+                            
+                            if current_qty == 0:
+                                if st.button("ADD +", key=f"add_init_{idx}", use_container_width=True):
                                     if "cart" not in st.session_state or not isinstance(st.session_state.cart, list):
                                         st.session_state.cart = []
                                     st.session_state.cart.append({"product": prod['name'], "quantity": "1 Unit"})
-                                    st.success("Added!")
                                     st.rerun()
-                            with btn_c2:
-                                if st.button("Cart", key=f"goto_cart_{idx}", use_container_width=True):
-                                    st.session_state.current_view = "Cart"
-                                    st.rerun()
+                            else:
+                                q_col1, q_col2, q_col3 = st.columns([1, 1, 1], gap="small")
+                                with q_col1:
+                                    if st.button("-", key=f"minus_{idx}", use_container_width=True):
+                                        for item_i, cart_item in enumerate(st.session_state.cart):
+                                            if cart_item.get('product') == prod['name']:
+                                                q_val = int(str(cart_item.get('quantity', '1')).split()[0])
+                                                if q_val > 1:
+                                                    st.session_state.cart[item_i]['quantity'] = f"{q_val - 1} Unit"
+                                                else:
+                                                    st.session_state.cart.pop(item_i)
+                                                break
+                                        st.rerun()
+                                with q_col2:
+                                    st.markdown(f"<div style='text-align: center; font-weight: 900; font-size: 12px; padding-top: 4px;'>{current_qty}</div>", unsafe_allow_html=True)
+                                with q_col3:
+                                    if st.button("+", key=f"plus_{idx}", use_container_width=True):
+                                        for item_i, cart_item in enumerate(st.session_state.cart):
+                                            if cart_item.get('product') == prod['name']:
+                                                q_val = int(str(cart_item.get('quantity', '1')).split()[0])
+                                                st.session_state.cart[item_i]['quantity'] = f"{q_val + 1} Unit"
+                                                break
+                                        st.rerun()
     else:
         st.info("No items found.")
 
