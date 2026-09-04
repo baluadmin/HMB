@@ -13,17 +13,8 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        /* Flush layout configuration */
-        .block-container { 
-            padding-top: 0rem !important; 
-            margin-top: 0rem !important; 
-            padding-bottom: 0.4rem !important; 
-            padding-left: 0.4rem !important; 
-            padding-right: 0.4rem !important; 
-            max-width: 480px !important; 
-            margin-left: auto; 
-            margin-right: auto; 
-        }
+        /* Pushed flush to the top edge */
+        .block-container { padding-top: 0rem !important; margin-top: 0rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -39,26 +30,21 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* True independent fixed header container */
+        /* Locked sticky top header and search bar container */
         .sticky-header {
-            position: fixed !important;
+            position: sticky !important;
             top: 0px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            width: 100% !important;
-            max-width: 480px !important;
-            z-index: 999999 !important;
+            z-index: 99999 !important;
             background-color: #f8fafc !important;
-            padding: 10px 10px 6px 10px !important;
-            box-sizing: border-box !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding-top: 8px !important;
+            padding-bottom: 8px !important;
+            margin-top: 0px !important;
         }
 
-        /* Completely isolated scrollable product catalog wrapper */
+        /* Scrollable product catalog viewport wrapper */
         .scrollable-catalog {
-            margin-top: 135px !important;
-            height: calc(100vh - 145px) !important;
-            overflow-y: auto !important;
+            max-height: 70vh;
+            overflow-y: auto;
             padding-right: 2px;
         }
     </style>
@@ -163,7 +149,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Completely Fixed Top Header Container wrapping Shop Name, Cart Button, and Search Bar
+    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -249,12 +235,14 @@ else:
 
     st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
 
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+
     if not active_query:
         filtered_products = product_records
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Completely Independent Scrollable Product Catalog Viewport Wrapper
+    # Scrollable container wrapper for products catalog
     st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
@@ -281,7 +269,7 @@ else:
                                     <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
                                     <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-title; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
