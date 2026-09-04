@@ -29,7 +29,6 @@ st.markdown(
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Force 3 columns per row on mobile for counter controls */
         [data-testid="column"] {
             flex: 1 1 0% !important;
             min-width: 0px !important;
@@ -37,7 +36,7 @@ st.markdown(
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 10px !important; border-radius: 6px !important; padding: 2px 0px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 2px 0px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
@@ -542,51 +541,39 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
-                            # Always render as a compact 3-column horizontal control (- | count | +)
-                            p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
-                            with p_c1:
-                                if st.button(
-                                    "-", key=f"minus_{idx}", use_container_width=True
-                                ):
-                                    for item_i, cart_item in enumerate(st.session_state.cart):
-                                        if cart_item.get("product") == prod["name"]:
-                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                            q_val = int(q_str) if q_str.isdigit() else 1
-                                            if q_val > 1:
-                                                st.session_state.cart[item_i]["quantity"] = (
-                                                    f"{q_val - 1} Unit"
-                                                )
-                                            else:
-                                                st.session_state.cart.pop(item_i)
-                                            break
-                                    st.rerun()
-                            with p_c2:
-                                st.markdown(
-                                    f"<div style='text-align: center; font-weight: 900;"
-                                    f" font-size: 11px; padding-top:"
-                                    f" 4px;'>{current_qty}</div>",
-                                    unsafe_allow_html=True,
-                                )
-                            with p_c3:
-                                if st.button(
-                                    "+", key=f"plus_{idx}", use_container_width=True
-                                ):
-                                    found = False
-                                    for item_i, cart_item in enumerate(st.session_state.cart):
-                                        if cart_item.get("product") == prod["name"]:
-                                            q_str = str(cart_item.get("quantity", "1")).split()[0]
-                                            q_val = int(q_str) if q_str.isdigit() else 1
-                                            st.session_state.cart[item_i]["quantity"] = (
-                                                f"{q_val + 1} Unit"
-                                            )
-                                            found = True
-                                            break
-                                    if not found:
-                                        st.session_state.cart.append({
-                                            "product": prod["name"],
-                                            "quantity": "1 Unit",
-                                        })
-                                    st.rerun()
+                            # Render in a single column stacked vertically (Minus button -> Count display -> Plus button)
+                            if st.button("-", key=f"minus_{idx}", use_container_width=True):
+                                for item_i, cart_item in enumerate(st.session_state.cart):
+                                    if cart_item.get("product") == prod["name"]:
+                                        q_str = str(cart_item.get("quantity", "1")).split()[0]
+                                        q_val = int(q_str) if q_str.isdigit() else 1
+                                        if q_val > 1:
+                                            st.session_state.cart[item_i]["quantity"] = f"{q_val - 1} Unit"
+                                        else:
+                                            st.session_state.cart.pop(item_i)
+                                        break
+                                st.rerun()
+
+                            st.markdown(
+                                f"<div style='text-align: center; font-weight: 900; font-size: 12px; margin: 2px 0;'>{current_qty}</div>",
+                                unsafe_allow_html=True,
+                            )
+
+                            if st.button("+", key=f"plus_{idx}", use_container_width=True):
+                                found = False
+                                for item_i, cart_item in enumerate(st.session_state.cart):
+                                    if cart_item.get("product") == prod["name"]:
+                                        q_str = str(cart_item.get("quantity", "1")).split()[0]
+                                        q_val = int(q_str) if q_str.isdigit() else 1
+                                        st.session_state.cart[item_i]["quantity"] = f"{q_val + 1} Unit"
+                                        found = True
+                                        break
+                                if not found:
+                                    st.session_state.cart.append({
+                                        "product": prod["name"],
+                                        "quantity": "1 Unit",
+                                    })
+                                st.rerun()
     else:
         st.info("No items found.")
 
