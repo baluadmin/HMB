@@ -78,31 +78,29 @@ if not st.session_state.logged_in:
     st.markdown("### 🥜 HMB Nuts & Spices - Login")
     st.markdown("Please enter your details to continue to the shop.")
     
-    with st.form("login_form"):
-        u_name = st.text_input("Username:")
-        m_num = st.text_input("Mobile Number:")
-        login_submitted = st.form_submit_button("Login to Shop", use_container_width=True)
-        
-        if login_submitted:
-            if u_name.strip() and m_num.strip():
-                st.session_state.logged_in = True
-                st.session_state.username = u_name.strip()
-                st.session_state.mobile = m_num.strip()
-                
-                # Send login data to Google Sheet via Web App API
-                try:
-                    payload = {
-                        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        "username": u_name.strip(),
-                        "mobile": m_num.strip()
-                    }
-                    requests.post(GOOGLE_SCRIPT_WEB_APP_URL, json=payload, timeout=5)
-                except Exception:
-                    pass
-                
-                st.rerun()
-            else:
-                st.warning("Please enter both username and mobile number.")
+    u_name = st.text_input("Username:")
+    m_num = st.text_input("Mobile Number:")
+    
+    if st.button("Login to Shop", use_container_width=True):
+        if u_name.strip() and m_num.strip():
+            st.session_state.logged_in = True
+            st.session_state.username = u_name.strip()
+            st.session_state.mobile = m_num.strip()
+            
+            # Send login data to Google Sheet via Web App API
+            try:
+                payload = {
+                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "username": u_name.strip(),
+                    "mobile": m_num.strip()
+                }
+                requests.post(GOOGLE_SCRIPT_WEB_APP_URL, json=payload, timeout=5)
+            except Exception:
+                pass
+            
+            st.rerun()
+        else:
+            st.warning("Please enter both username and mobile number.")
     st.stop()
 
 @st.cache_data(ttl=2)
