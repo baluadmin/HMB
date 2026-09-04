@@ -41,24 +41,6 @@ st.markdown("""
             margin-bottom: 8px;
         }
 
-        /* Floating professional bottom bar for persistent cart view */
-        .floating-cart-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            max-width: 480px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            padding: 10px 16px;
-            z-index: 999999;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
-        }
-
         div[data-testid="stVerticalBlock"] {
             gap: 0.2rem !important;
         }
@@ -72,8 +54,8 @@ st.markdown("""
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
 OWNER_PHONE_NUMBER = "9840450113"
 
-if "cart" not in st.session_state:
-    st.session_state.cart = {}  # Using dictionary to store product_id/name and count
+if "cart" not in st.session_state or not isinstance(st.session_state.cart, dict):
+    st.session_state.cart = {}
 if "search_query" not in st.session_state:
     st.session_state.search_query = ""
 if "current_view" not in st.session_state:
@@ -110,7 +92,6 @@ if not product_records:
         {"id": "ITM003", "name": "Raw Pumpkin Seeds", "price": "350", "stock": "100", "category": "Seeds", "image": "", "description": "250g"}
     ]
 
-# Calculate total cart items and price for professional bottom bar
 total_cart_items = sum(st.session_state.cart.values())
 
 if st.session_state.current_view == "Cart":
@@ -170,7 +151,6 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Fixed Sticky Header Container
     st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -251,7 +231,7 @@ else:
                 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True) # End fixed-header div
+    st.markdown('</div>', unsafe_allow_html=True)
 
     if not active_query:
         filtered_products = product_records
@@ -311,17 +291,3 @@ else:
                                         st.rerun()
     else:
         st.info("No items found.")
-
-    # Professional Persistent Floating Bottom Bar for Cart Navigation
-    if total_cart_items > 0:
-        st.markdown(f"""
-            <div class="floating-cart-bar">
-                <div>
-                    <span style="font-weight: 900; font-size: 12px; color: #0f172a;">{total_cart_items} item(s) added</span>
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("🛒 View Cart & Checkout", key="floating_cart_btn", use_container_width=True):
-            st.session_state.current_view = "Cart"
-            st.rerun()
