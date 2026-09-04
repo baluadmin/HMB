@@ -59,7 +59,7 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 110px;
+            height: 160px;
             background: #f1f5f9;
             border-radius: 6px;
             display: flex;
@@ -70,7 +70,7 @@ st.markdown(
         }
         .product-img-box img {
             max-width: 100% !important;
-            max-height: 110px !important;
+            max-height: 160px !important;
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
@@ -392,7 +392,9 @@ else:
             unsafe_allow_html=True,
         )
       with sug_col2:
-        if st.button(prod["name"], key=f"dropdown_sug_{idx}", use_container_width=True):
+        if st.button(
+            prod["name"], key=f"dropdown_sug_{idx}", use_container_width=True
+        ):
           st.session_state.search_query = prod["name"]
           st.rerun()
 
@@ -486,7 +488,9 @@ else:
               current_qty = get_cart_qty(prod["name"])
 
               if current_qty == 0:
-                if st.button("ADD +", key=f"add_init_{idx}", use_container_width=True):
+                if st.button(
+                    "ADD +", key=f"add_init_{idx}", use_container_width=True
+                ):
                   if "cart" not in st.session_state or not isinstance(
                       st.session_state.cart, list
                   ):
@@ -501,7 +505,9 @@ else:
                     [1, 1, 1, 1.2], gap="small"
                 )
                 with p_c1:
-                  if st.button("-", key=f"minus_{idx}", use_container_width=True):
+                  if st.button(
+                      "-", key=f"minus_{idx}", use_container_width=True
+                  ):
                     for item_i, cart_item in enumerate(st.session_state.cart):
                       if cart_item.get("product") == prod["name"]:
                         q_str = str(cart_item.get("quantity", "1")).split()[0]
@@ -522,7 +528,9 @@ else:
                       unsafe_allow_html=True,
                   )
                 with p_c3:
-                  if st.button("+", key=f"plus_{idx}", use_container_width=True):
+                  if st.button(
+                      "+", key=f"plus_{idx}", use_container_width=True
+                  ):
                     for item_i, cart_item in enumerate(st.session_state.cart):
                       if cart_item.get("product") == prod["name"]:
                         q_str = str(cart_item.get("quantity", "1")).split()[0]
@@ -533,7 +541,9 @@ else:
                         break
                     st.rerun()
                 with p_c4:
-                  if st.button("Cart", key=f"gotocart_btn_{idx}", use_container_width=True):
+                  if st.button(
+                      "Cart", key=f"gotocart_btn_{idx}", use_container_width=True
+                  ):
                     st.session_state.current_view = "Cart"
                     st.rerun()
   else:
