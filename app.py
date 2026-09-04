@@ -14,7 +14,7 @@ st.markdown("""
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
         /* Pushed flush to the top edge */
-        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; height: 100vh !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,22 +30,22 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky top header and search bar container locked firmly in place */
-        .sticky-header {
-            position: sticky !important;
-            top: 0px !important;
-            z-index: 99999 !important;
-            background-color: #f8fafc !important;
-            padding-top: 10px !important;
-            padding-bottom: 6px !important;
-            margin-top: 0px !important;
+        /* Fixed top header section that does not move */
+        .fixed-header {
+            flex-shrink: 0;
+            background-color: #f8fafc;
+            padding-top: 8px;
+            padding-bottom: 4px;
+            z-index: 999;
         }
 
-        /* Scrollable product catalog viewport wrapper */
+        /* Dedicated independent scrollable catalog wrapper */
         .scrollable-catalog {
-            max-height: 72vh;
+            flex-grow: 1;
             overflow-y: auto;
             padding-right: 2px;
+            padding-bottom: 20px;
+            -webkit-overflow-scrolling: touch;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -146,8 +146,8 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
-    st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
+    # Fixed Header Container wrapping Shop Name, Cart Button, and Search Bar (Non-moving)
+    st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
     with top_col1:
@@ -228,7 +228,7 @@ else:
                 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
+    st.markdown('</div>', unsafe_allow_html=True) # End fixed-header div
 
     st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
@@ -237,7 +237,7 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Scrollable container wrapper for products catalog
+    # Independent scrollable container wrapper for products catalog
     st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
