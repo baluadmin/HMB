@@ -14,7 +14,7 @@ st.markdown("""
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
         /* Pushed flush to the top edge */
-        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; height: 100vh !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         /* Prevent Streamlit columns from stacking on mobile screens */
@@ -30,22 +30,23 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Fixed top header section that does not move */
+        /* Sticky top header that stays pinned at the top */
         .fixed-header {
-            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
             background-color: #f8fafc;
             padding-top: 8px;
             padding-bottom: 4px;
-            z-index: 999;
         }
 
-        /* Dedicated independent scrollable catalog wrapper */
+        /* Fully functional independent scrollable catalog wrapper */
         .scrollable-catalog {
-            flex-grow: 1;
+            height: 68vh;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding-right: 2px;
             padding-bottom: 20px;
-            -webkit-overflow-scrolling: touch;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -146,7 +147,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Fixed Header Container wrapping Shop Name, Cart Button, and Search Bar (Non-moving)
+    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="fixed-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -237,7 +238,7 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Independent scrollable container wrapper for products catalog
+    # Scrollable container wrapper for products catalog with proper touch/mouse scrolling enabled
     st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
