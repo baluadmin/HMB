@@ -120,11 +120,12 @@ product_records = []
 if not inv_df.empty:
     for _, row in inv_df.iterrows():
         if len(row) > 4 and pd.notna(row.iloc[0]) and pd.notna(row.iloc[1]) and str(row.iloc[0]).strip() != "id":
+            img_val = str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
             product_records.append({
                 "id": str(row.iloc[0]), "name": str(row.iloc[1]), "category": str(row.iloc[2]).strip(),
                 "stock": str(row.iloc[3]), "price": str(row.iloc[4]),
                 "description": str(row.iloc[5]).strip() if len(row) > 5 and pd.notna(row.iloc[5]) else "1 Pack",
-                "image": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else ""
+                "image": img_val
             })
 
 if not product_records:
@@ -309,14 +310,25 @@ else:
                     raw_price_str = "".join([c for c in str(prod['price']) if c.isdigit() or c == '.'])
                     base_price = float(raw_price_str) if raw_price_str else 0.0
                     
+                    img_path = f"images/{prod['image']}" if prod['image'] and os.path.exists(f"images/{prod['image']}") else ""
+                    
                     with cols[j]:
                         with st.container(border=True):
-                            st.markdown(
-                                f"""
-                                <div style="background: #ffffff; border-radius: 6px;">
+                            if img_path:
+                                st.image(img_path, use_container_width=True)
+                            else:
+                                st.markdown(
+                                    """
                                     <div style="background: #f1f5f9; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 3px;">
                                         📦 IMG
                                     </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+                            
+                            st.markdown(
+                                f"""
+                                <div style="background: #ffffff; border-radius: 6px;">
                                     <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
                                     <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
                                     <div style="color: #64748b; font-size: 8px; margin-top: 1px;">{prod['description']}</div>
