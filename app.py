@@ -16,7 +16,7 @@ st.markdown("""
         .block-container { 
             padding-top: 0rem !important; 
             margin-top: 0rem !important; 
-            padding-bottom: 1rem !important; 
+            padding-bottom: 0.4rem !important; 
             padding-left: 0.4rem !important; 
             padding-right: 0.4rem !important; 
             max-width: 480px !important; 
@@ -25,6 +25,7 @@ st.markdown("""
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
+        /* Prevent Streamlit columns from stacking on mobile screens */
         [data-testid="column"] {
             width: 50% !important;
             flex: 1 1 50% !important;
@@ -33,19 +34,27 @@ st.markdown("""
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 5px !important; min-height: unset !important; width: 100% !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 4px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky header that stays pinned at the top during smooth page scrolling */
+        /* Pinned sticky header that stays locked at the top */
         .sticky-header {
             position: sticky !important;
             top: 0px !important;
             z-index: 999999 !important;
             background-color: #f8fafc !important;
-            padding: 8px 4px 6px 4px !important;
+            padding: 8px 4px 4px 4px !important;
             margin: 0px !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        /* Independent scrollable product catalog wrapper with separate scrolling */
+        .scrollable-catalog {
+            max-height: calc(100vh - 150px) !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+            padding-right: 4px;
+            margin-top: 6px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -240,7 +249,8 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+    # Completely Independent Scrollable Product Catalog Viewport Wrapper
+    st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
         for i in range(0, len(filtered_products), 2):
@@ -258,15 +268,15 @@ else:
                         with st.container(border=True):
                             st.markdown(
                                 f"""
-                                <div style="background: #ffffff; border-radius: 8px;">
-                                    <div style="background: #f1f5f9; height: 110px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 10px; font-weight: 800; margin-bottom: 6px;">
+                                <div style="background: #ffffff; border-radius: 6px;">
+                                    <div style="background: #f1f5f9; height: 90px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 9px; font-weight: 800; margin-bottom: 4px;">
                                         📦 PRODUCT IMG
                                     </div>
-                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
-                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
-                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
-                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
+                                    <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
+                                    <div style="font-weight: 900; font-size: 10px; height: 28px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
+                                    <div style="color: #64748b; font-size: 9px; margin-top: 1px;">{prod['description']}</div>
+                                    <div style="color: #059669; font-size: 9px; font-weight: 800; margin-top: 2px;">10% OFF</div>
+                                    <div style="font-weight: 900; font-size: 12px; color: #0f172a; margin-top: 1px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 9px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """, 
                                 unsafe_allow_html=True
@@ -280,3 +290,5 @@ else:
                                 st.rerun()
     else:
         st.info("No items found.")
+
+    st.markdown('</div>', unsafe_allow_html=True) # End scrollable-catalog div
