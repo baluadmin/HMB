@@ -314,17 +314,23 @@ else:
                     
                     with cols[j]:
                         with st.container(border=True):
+                            # Fixed image container wrapper to maintain exact uniform box size & alignment across all cards
+                            st.markdown(
+                                '<div style="height: 140px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 4px;">',
+                                unsafe_allow_html=True
+                            )
                             if img_path:
                                 st.image(img_path, use_container_width=True)
                             else:
                                 st.markdown(
                                     """
-                                    <div style="background: #f1f5f9; height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800; margin-bottom: 3px;">
+                                    <div style="background: #f1f5f9; width: 100%; height: 100%; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 8px; font-weight: 800;">
                                         📦 IMG
                                     </div>
                                     """,
                                     unsafe_allow_html=True
                                 )
+                            st.markdown('</div>', unsafe_allow_html=True)
                             
                             st.markdown(
                                 f"""
