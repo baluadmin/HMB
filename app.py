@@ -19,7 +19,7 @@ st.markdown(
         
         .block-container { 
             padding-top: 0rem !important; 
-            margin-top: 0rem !important; 
+            margin-top: -1rem !important; 
             padding-bottom: 0.4rem !important; 
             padding-left: 0.4rem !important; 
             padding-right: 0.4rem !important; 
@@ -30,38 +30,38 @@ st.markdown(
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
         [data-testid="column"] {
-            flex: 1 1 0% !important;
-            min-width: 0px !important;
+            width: 50% !important;
+            flex: 1 1 50% !important;
+            min-width: 50% !important;
         }
 
         div.stButton > button {
             background: #ffffff !important;
-            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 9px !important; border-radius: 6px !important; padding: 4px 2px !important; min-height: unset !important; width: 100% !important; white-space: nowrap !important;
+            color: #2563eb !important; border: 1px solid #bfdbfe !important; font-weight: 800 !important; font-size: 11px !important; border-radius: 6px !important; padding: 5px !important; min-height: unset !important; width: 100% !important;
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
         .sticky-header {
             position: sticky !important;
             top: 0px !important;
-            z-index: 999999 !important;
+            z-index: 99999 !important;
             background-color: #f8fafc !important;
-            padding: 8px 4px 4px 4px !important;
-            margin: 0px !important;
+            padding-top: 10px !important;
+            padding-bottom: 6px !important;
+            margin-top: 0px !important;
         }
 
         .scrollable-catalog {
-            max-height: calc(100vh - 150px) !important;
-            overflow-y: auto !important;
-            -webkit-overflow-scrolling: touch;
-            padding-right: 4px;
-            margin-top: 6px;
+            max-height: 72vh;
+            overflow-y: auto;
+            padding-right: 2px;
         }
 
         .product-img-box {
             width: 100%;
-            height: 120px;
+            height: 110px;
             background: #f1f5f9;
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -70,11 +70,11 @@ st.markdown(
         }
         .product-img-box img {
             max-width: 100% !important;
-            max-height: 120px !important;
+            max-height: 110px !important;
             width: auto !important;
             height: auto !important;
             object-fit: contain !important;
-            border-radius: 6px;
+            border-radius: 8px;
         }
     </style>
 """,
@@ -82,15 +82,8 @@ st.markdown(
 )
 
 NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OVFxJBKOBbCxyW3cVcXu2J6zJCzQUxkCc/export?format=csv&gid=0"
-GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1NgLmYl63JP3Qz7iq3bWbe6of4OAsRwyUIyXL66rqdJRNJPX8oK6RoKUuz2evHxC3lA/exec"
 OWNER_PHONE_NUMBER = "9840450113"
 
-if "logged_in" not in st.session_state:
-  st.session_state.logged_in = False
-if "username" not in st.session_state:
-  st.session_state.username = ""
-if "mobile" not in st.session_state:
-  st.session_state.mobile = ""
 if "cart" not in st.session_state or not isinstance(
     st.session_state.cart, list
 ):
@@ -99,41 +92,6 @@ if "search_query" not in st.session_state:
   st.session_state.search_query = ""
 if "current_view" not in st.session_state:
   st.session_state.current_view = "Shop"
-
-# --- LOGIN PAGE ---
-if not st.session_state.logged_in:
-  st.markdown("### 🥜 HMB Nuts & Spices - Login")
-  st.markdown("Please enter your details to continue to the shop.")
-
-  u_name = st.text_input("Username:")
-  m_num = st.text_input(
-      "Mobile Number:", max_chars=10, placeholder="Enter 10-digit number"
-  )
-
-  if st.button("Login to Shop", use_container_width=True):
-    if not u_name.strip() or not m_num.strip():
-      st.warning("Please enter both username and mobile number.")
-    elif not m_num.isdigit() or len(m_num) != 10:
-      st.warning(
-          "Please enter a valid 10-digit mobile number containing only numbers."
-      )
-    else:
-      st.session_state.logged_in = True
-      st.session_state.username = u_name.strip()
-      st.session_state.mobile = m_num.strip()
-
-      try:
-        payload = {
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "username": u_name.strip(),
-            "mobile": m_num.strip(),
-        }
-        requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
-      except Exception:
-        pass
-
-      st.rerun()
-  st.stop()
 
 
 @st.cache_data(ttl=2)
@@ -167,11 +125,6 @@ if not inv_df.empty:
         and pd.notna(row.iloc[1])
         and str(row.iloc[0]).strip() != "id"
     ):
-      img_val = (
-          str(row.iloc[6]).strip()
-          if len(row) > 6 and pd.notna(row.iloc[6])
-          else ""
-      )
       product_records.append({
           "id": str(row.iloc[0]),
           "name": str(row.iloc[1]),
@@ -183,7 +136,11 @@ if not inv_df.empty:
               if len(row) > 5 and pd.notna(row.iloc[5])
               else "1 Pack"
           ),
-          "image": img_val,
+          "image": (
+              str(row.iloc[6]).strip()
+              if len(row) > 6 and pd.notna(row.iloc[6])
+              else ""
+          ),
       })
 
 if not product_records:
@@ -232,7 +189,7 @@ if st.session_state.current_view == "Cart":
             f" ({item.get('quantity', '1 Unit')})"
         )
       with c2:
-        if st.button("Remove", key=f"rem_{idx}", use_container_width=True):
+        if st.button("Remove Item", key=f"rem_{idx}", use_container_width=True):
           st.session_state.cart.pop(idx)
           st.rerun()
 
@@ -241,9 +198,7 @@ if st.session_state.current_view == "Cart":
 
     with st.form("checkout_form"):
       delivery_address = st.text_area("Delivery Address:")
-      alt_contact = st.text_input(
-          "Alternative Contact Number:", value=st.session_state.mobile
-      )
+      alt_contact = st.text_input("Alternative Contact Number:")
       custom_desc = st.text_area("Product Specifications / Custom Description:")
 
       submitted = st.form_submit_button(
@@ -256,7 +211,7 @@ if st.session_state.current_view == "Cart":
               for i in st.session_state.cart
           ])
 
-          wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+          wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
           encoded_message = urllib.parse.quote(wa_message)
           wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
 
@@ -293,9 +248,11 @@ if st.session_state.current_view == "Cart":
 else:
   st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
 
-  top_col1, top_col2, top_col3 = st.columns([1.8, 1.1, 1.1], gap="small")
+  top_col1, top_col2 = st.columns([3, 1], gap="small")
   with top_col1:
-    if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
+    if st.button(
+        "🥜 HMB Nuts & Seeds", key="home_btn", use_container_width=True
+    ):
       st.session_state.current_view = "Shop"
       st.session_state.search_query = ""
       st.rerun()
@@ -303,17 +260,8 @@ else:
     if not isinstance(st.session_state.cart, list):
       st.session_state.cart = []
     cart_count = len(st.session_state.cart)
-    if st.button(
-        f"🛒 Cart ({cart_count})", key="cart_btn", use_container_width=True
-    ):
+    if st.button(f"🛒 Cart ({cart_count})", use_container_width=True):
       st.session_state.current_view = "Cart"
-      st.rerun()
-  with top_col3:
-    if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
-      st.session_state.logged_in = False
-      st.session_state.username = ""
-      st.session_state.mobile = ""
-      st.session_state.cart = []
       st.rerun()
 
   st.markdown(
@@ -377,12 +325,12 @@ else:
   ):
     st.markdown(
         """
-            <div style="max-height: 200px; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
         """,
         unsafe_allow_html=True,
     )
 
-    for idx, prod in enumerate(matching_suggestions[:10]):
+    for idx, prod in enumerate(matching_suggestions[:6]):
       sug_col1, sug_col2 = st.columns([1, 6], gap="small")
       with sug_col1:
         st.markdown(
@@ -402,24 +350,14 @@ else:
 
   st.markdown("</div>", unsafe_allow_html=True)
 
+  st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+
   if not active_query:
     filtered_products = product_records
   else:
     filtered_products = get_matching_products(active_query, product_records)
 
-  st.markdown(
-      '<div class="scrollable-catalog" id="product-catalog-box">',
-      unsafe_allow_html=True,
-  )
-
-
-  def get_cart_qty(prod_name):
-    for item in st.session_state.cart:
-      if item.get("product") == prod_name:
-        q_str = str(item.get("quantity", "1 Unit")).split()[0]
-        return int(q_str) if q_str.isdigit() else 1
-    return 0
-
+  st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
   if filtered_products:
     for i in range(0, len(filtered_products), 2):
@@ -433,6 +371,7 @@ else:
               [c for c in str(prod["price"]) if c.isdigit() or c == "."]
           )
           base_price = float(raw_price_str) if raw_price_str else 0.0
+          mrp_price = int(base_price * 1.1)
 
           img_path = (
               f"images/{prod['image']}"
@@ -446,106 +385,48 @@ else:
                 try:
                   with open(img_path, "rb") as img_file:
                     encoded_img = base64.b64encode(img_file.read()).decode()
-                  st.markdown(
-                      f"""
-                                        <div class="product-img-box">
-                                            <img src="data:image/jpeg;base64,{encoded_img}" alt="{prod['name']}">
-                                        </div>
-                                        """,
-                      unsafe_allow_html=True,
-                  )
-                except Exception:
-                  st.markdown(
-                      """
-                                        <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
-                                            📦 IMG
-                                        </div>
-                                        """,
-                      unsafe_allow_html=True,
-                  )
-              else:
-                st.markdown(
-                    """
-                                    <div class="product-img-box" style="color: #94a3b8; font-size: 8px; font-weight: 800;">
-                                        📦 IMG
+                  img_html = f"""
+                                    <div class="product-img-box">
+                                        <img src="data:image/jpeg;base64,{encoded_img}" alt="{prod['name']}">
                                     </div>
-                                    """,
-                    unsafe_allow_html=True,
-                )
+                                    """
+                except Exception:
+                  img_html = """
+                                    <div class="product-img-box" style="color: #94a3b8; font-size: 10px; font-weight: 800;">
+                                        📦 PRODUCT IMG
+                                    </div>
+                                    """
+              else:
+                img_html = """
+                                <div class="product-img-box" style="color: #94a3b8; font-size: 10px; font-weight: 800;">
+                                    📦 PRODUCT IMG
+                                </div>
+                                """
 
               st.markdown(
                   f"""
-                                <div style="background: #ffffff; border-radius: 6px;">
-                                    <div style="font-size: 8px; font-weight: 800; color: #64748b; margin-bottom: 1px;">10 MINS</div>
-                                    <div style="font-weight: 900; font-size: 10px; height: 26px; overflow: hidden; color: #0f172a; line-height: 1.1;">{prod['name']}</div>
-                                    <div style="color: #64748b; font-size: 8px; margin-top: 1px;">{prod['description']}</div>
-                                    <div style="font-weight: 900; font-size: 11px; color: #0f172a; margin-top: 3px;">₹{int(base_price)}</div>
+                                <div style="background: #ffffff; border-radius: 8px;">
+                                    {img_html}
+                                    <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 2px;">10 MINS</div>
+                                    <div style="font-weight: 900; font-size: 11px; height: 32px; overflow: hidden; color: #0f172a; line-height: 1.2;">{prod['name']}</div>
+                                    <div style="color: #64748b; font-size: 10px; margin-top: 2px;">{prod['description']}</div>
+                                    <div style="color: #059669; font-size: 10px; font-weight: 800; margin-top: 4px;">10% OFF</div>
+                                    <div style="font-weight: 900; font-size: 13px; color: #0f172a; margin-top: 2px;">₹{int(base_price)} <span style="text-decoration: line-through; color: #94a3b8; font-size: 10px; font-weight: 600;">₹{mrp_price}</span></div>
                                 </div>
                                 """,
                   unsafe_allow_html=True,
               )
 
-              current_qty = get_cart_qty(prod["name"])
-
-              if current_qty == 0:
-                if st.button(
-                    "ADD +", key=f"add_init_{idx}", use_container_width=True
+              if st.button("ADD +", key=f"add_app_{idx}", use_container_width=True):
+                if "cart" not in st.session_state or not isinstance(
+                    st.session_state.cart, list
                 ):
-                  if "cart" not in st.session_state or not isinstance(
-                      st.session_state.cart, list
-                  ):
-                    st.session_state.cart = []
-                  st.session_state.cart.append({
-                      "product": prod["name"],
-                      "quantity": "1 Unit",
-                  })
-                  st.rerun()
-              else:
-                p_c1, p_c2, p_c3, p_c4 = st.columns(
-                    [1, 1, 1, 1.2], gap="small"
+                  st.session_state.cart = []
+                st.session_state.cart.append(
+                    {"product": prod["name"], "quantity": "1 Unit"}
                 )
-                with p_c1:
-                  if st.button(
-                      "-", key=f"minus_{idx}", use_container_width=True
-                  ):
-                    for item_i, cart_item in enumerate(st.session_state.cart):
-                      if cart_item.get("product") == prod["name"]:
-                        q_str = str(cart_item.get("quantity", "1")).split()[0]
-                        q_val = int(q_str) if q_str.isdigit() else 1
-                        if q_val > 1:
-                          st.session_state.cart[item_i]["quantity"] = (
-                              f"{q_val - 1} Unit"
-                          )
-                        else:
-                          st.session_state.cart.pop(item_i)
-                        break
-                    st.rerun()
-                with p_c2:
-                  st.markdown(
-                      f"<div style='text-align: center; font-weight: 900;"
-                      f" font-size: 11px; padding-top:"
-                      f" 6px;'>{current_qty}</div>",
-                      unsafe_allow_html=True,
-                  )
-                with p_c3:
-                  if st.button(
-                      "+", key=f"plus_{idx}", use_container_width=True
-                  ):
-                    for item_i, cart_item in enumerate(st.session_state.cart):
-                      if cart_item.get("product") == prod["name"]:
-                        q_str = str(cart_item.get("quantity", "1")).split()[0]
-                        q_val = int(q_str) if q_str.isdigit() else 1
-                        st.session_state.cart[item_i]["quantity"] = (
-                            f"{q_val + 1} Unit"
-                        )
-                        break
-                    st.rerun()
-                with p_c4:
-                  if st.button(
-                      "Cart", key=f"gotocart_btn_{idx}", use_container_width=True
-                  ):
-                    st.session_state.current_view = "Cart"
-                    st.rerun()
+                st.success("Added!")
+                st.rerun()
   else:
     st.info("No items found.")
 
