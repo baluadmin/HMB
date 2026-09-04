@@ -74,7 +74,7 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 140px;
+            height: 120px;
             background: #f1f5f9;
             border-radius: 6px;
             display: flex;
@@ -86,7 +86,7 @@ st.markdown(
         .product-img-box img {
             width: 100% !important;
             height: 100% !important;
-            object-fit: fill !important;
+            object-fit: contain !important;
             border-radius: 6px;
         }
 
