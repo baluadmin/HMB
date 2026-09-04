@@ -29,7 +29,11 @@ st.markdown(
         }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Custom styling for the Stepper layout (- | count | +) */
+        [data-testid="column"] {
+            flex: 1 1 0% !important;
+            min-width: 0px !important;
+        }
+
         div.stButton > button {
             background: #fce7f3 !important;
             color: #db2777 !important; 
@@ -80,15 +84,12 @@ st.markdown(
             margin-bottom: 6px;
         }
         .product-img-box img {
-            max-width: 100% !important;
-            max-height: 110px !important;
-            width: auto !important;
-            height: auto !important;
+            width: 100% !important;
+            height: 100% !important;
             object-fit: contain !important;
             border-radius: 6px;
         }
 
-        /* Fixed Bottom-Left Aligned Bar Container */
         .fixed-bottom-bar {
             position: fixed !important;
             bottom: 0px !important;
@@ -132,11 +133,9 @@ if "search_query" not in st.session_state:
 if "current_view" not in st.session_state:
     st.session_state.current_view = "Shop"
 
-# Sync view with query parameters if present
 if "view" in st.query_params:
     st.session_state.current_view = st.query_params["view"]
 
-# --- LOGIN PAGE ---
 if not st.session_state.logged_in:
     st.markdown("### 🥜 HMB Nuts & Spices - Login")
     st.markdown("Please enter your details to continue to the shop.")
@@ -253,7 +252,6 @@ if not product_records:
         },
     ]
 
-# --- GLOBAL STICKY HEADER (Home & Logout buttons) ---
 st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
 
 top_col1, top_col2 = st.columns([2, 1], gap="small")
@@ -282,7 +280,6 @@ st.markdown(
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- FIXED BOTTOM STICKY BAR FOR CART (Left-aligned) ---
 if not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 
@@ -308,8 +305,6 @@ if cart_count > 0 and st.session_state.current_view == "Shop":
         unsafe_allow_html=True,
     )
 
-
-# --- VIEW ROUTING ---
 if st.session_state.current_view == "Cart":
     st.markdown("### Your Shopping Cart & Checkout")
 
@@ -386,7 +381,6 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # --- SHOP CATALOG VIEW ---
     srch_c1, srch_c2 = st.columns([4, 1], gap="small")
     with srch_c1:
         search_query = st.text_input(
@@ -552,7 +546,6 @@ else:
 
                             current_qty = get_cart_qty(prod["name"])
 
-                            # Perfectly matched horizontal stepper (- | count | +) matching your requested pink theme styling
                             p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
                             with p_c1:
                                 if st.button(
