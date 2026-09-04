@@ -13,11 +13,18 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Mulish:wght@600;700;800;900&display=swap');
         html, body, [class*="css"] { font-family: 'Mulish', sans-serif !important; background-color: #f8fafc !important; }
         
-        /* Pushed flush to the top edge */
-        .block-container { padding-top: 0rem !important; margin-top: -1rem !important; padding-bottom: 0.4rem !important; padding-left: 0.4rem !important; padding-right: 0.4rem !important; max-width: 480px !important; margin-left: auto; margin-right: auto; }
+        .block-container { 
+            padding-top: 0rem !important; 
+            margin-top: 0rem !important; 
+            padding-bottom: 0.4rem !important; 
+            padding-left: 0.4rem !important; 
+            padding-right: 0.4rem !important; 
+            max-width: 480px !important; 
+            margin-left: auto; 
+            margin-right: auto; 
+        }
         #MainMenu, header, footer, div[data-testid="stToolbar"] {visibility: hidden; display: none; height: 0px;}
 
-        /* Prevent Streamlit columns from stacking on mobile screens */
         [data-testid="column"] {
             width: 50% !important;
             flex: 1 1 50% !important;
@@ -30,22 +37,22 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Sticky top header and search bar container locked firmly in place */
+        /* Pinned sticky header configuration */
         .sticky-header {
             position: sticky !important;
             top: 0px !important;
-            z-index: 99999 !important;
+            z-index: 999999 !important;
             background-color: #f8fafc !important;
-            padding-top: 10px !important;
-            padding-bottom: 6px !important;
-            margin-top: 0px !important;
+            padding: 8px 4px 4px 4px !important;
+            margin: 0px !important;
         }
 
-        /* Scrollable product catalog viewport wrapper */
+        /* Clean independent scrollable catalog wrapper */
         .scrollable-catalog {
-            max-height: 72vh;
-            overflow-y: auto;
+            max-height: 72vh !important;
+            overflow-y: auto !important;
             padding-right: 2px;
+            margin-top: 4px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -216,11 +223,12 @@ else:
         matching_suggestions = get_matching_products(active_query, product_records)
 
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
+        # Independent scrollable box for search suggestions dropdown to prevent overflowing background screen layout
         st.markdown("""
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+            <div style="max-height: 200px; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         """, unsafe_allow_html=True)
         
-        for idx, prod in enumerate(matching_suggestions[:6]):
+        for idx, prod in enumerate(matching_suggestions[:10]):
             sug_col1, sug_col2 = st.columns([1, 6], gap="small")
             with sug_col1:
                 st.markdown("""
@@ -234,8 +242,6 @@ else:
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True) # End sticky-header div
-
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
     if not active_query:
         filtered_products = product_records
