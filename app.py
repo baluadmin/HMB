@@ -76,6 +76,30 @@ st.markdown(
             object-fit: contain !important;
             border-radius: 6px;
         }
+
+        /* Floating Bottom-Left Cart Popup */
+        .floating-cart-badge {
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            z-index: 9999999 !important;
+            background: #2563eb !important;
+            color: #ffffff !important;
+            padding: 12px 18px !important;
+            border-radius: 30px !important;
+            font-weight: 900 !important;
+            font-size: 13px !important;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+            border: 2px solid #ffffff !important;
+        }
+        .floating-cart-badge:hover {
+            background: #1d4ed8 !important;
+        }
     </style>
 """,
     unsafe_allow_html=True,
@@ -217,25 +241,16 @@ if not product_records:
         },
     ]
 
-# --- GLOBAL STICKY HEADER (Persistent across Shop & Cart views) ---
+# --- GLOBAL STICKY HEADER (Home & Logout buttons) ---
 st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
 
-top_col1, top_col2, top_col3 = st.columns([1.8, 1.1, 1.1], gap="small")
+top_col1, top_col2 = st.columns([2, 1], gap="small")
 with top_col1:
     if st.button("🥜 HMB Nuts", key="home_btn", use_container_width=True):
         st.session_state.current_view = "Shop"
         st.session_state.search_query = ""
         st.rerun()
 with top_col2:
-    if not isinstance(st.session_state.cart, list):
-        st.session_state.cart = []
-    cart_count = len(st.session_state.cart)
-    if st.button(
-        f"🛒 Cart ({cart_count})", key="cart_btn", use_container_width=True
-    ):
-        st.session_state.current_view = "Cart"
-        st.rerun()
-with top_col3:
     if st.button("🚪 Logout", key="logout_btn", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.username = ""
@@ -251,6 +266,31 @@ st.markdown(
 )
 
 st.markdown("</div>", unsafe_allow_html=True)
+
+# --- FLOATING BOTTOM-LEFT CART BUTTON (Only shows if items exist in cart) ---
+if not isinstance(st.session_state.cart, list):
+    st.session_state.cart = []
+
+cart_count = len(st.session_state.cart)
+if cart_count > 0:
+    # We use a custom button replacement form or query param trick, or we can handle click via st.button if placed cleanly,
+    # but since it's floating absolute, let's render a Streamlit button wrapper right above or use an action button.
+    # Alternatively, let's provide a dedicated bottom container button for opening the cart:
+    st.markdown(
+        f"""
+        <div style="position: fixed; bottom: 20px; left: 20px; z-index: 999999;">
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button(
+        f"🛒 View Cart ({cart_count})",
+        key="floating_cart_btn",
+        use_container_width=False,
+    ):
+        st.session_state.current_view = "Cart"
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # --- VIEW ROUTING ---
 if st.session_state.current_view == "Cart":
@@ -507,9 +547,7 @@ else:
                                     })
                                     st.rerun()
                             else:
-                                p_c1, p_c2, p_c3, p_c4 = st.columns(
-                                    [1, 1, 1, 1.2], gap="small"
-                                )
+                                p_c1, p_c2, p_c3 = st.columns([1, 1, 1], gap="small")
                                 with p_c1:
                                     if st.button(
                                         "-", key=f"minus_{idx}", use_container_width=True
@@ -545,12 +583,6 @@ else:
                                                     f"{q_val + 1} Unit"
                                                 )
                                                 break
-                                        st.rerun()
-                                with p_c4:
-                                    if st.button(
-                                        "Cart", key=f"gotocart_btn_{idx}", use_container_width=True
-                                    ):
-                                        st.session_state.current_view = "Cart"
                                         st.rerun()
     else:
         st.info("No items found.")
