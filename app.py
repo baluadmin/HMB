@@ -74,8 +74,8 @@ st.markdown(
 
         .product-img-box {
             width: 100%;
-            height: 120px;
-            background: #f1f5f9;
+            height: 140px;
+            background: #ffffff;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -87,6 +87,7 @@ st.markdown(
             width: 100% !important;
             height: 100% !important;
             object-fit: contain !important;
+            background-color: #ffffff !important;
             border-radius: 6px;
         }
 
@@ -118,12 +119,6 @@ NEW_GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1b_oAav63v5OV
 GOOGLE_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1NgLmYl63JP3Qz7iq3bWbe6of4OAsRwyUIyXL66rqdJRNJPX8oK6RoKUuz2evHxC3lA/exec"
 OWNER_PHONE_NUMBER = "9840450113"
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
-if "mobile" not in st.session_state:
-    st.session_state.mobile = ""
 if "cart" not in st.session_state or not isinstance(
     st.session_state.cart, list
 ):
@@ -135,40 +130,6 @@ if "current_view" not in st.session_state:
 
 if "view" in st.query_params:
     st.session_state.current_view = st.query_params["view"]
-
-if not st.session_state.logged_in:
-    st.markdown("### 🥜 HMB Nuts & Spices - Login")
-    st.markdown("Please enter your details to continue to the shop.")
-
-    u_name = st.text_input("Username:")
-    m_num = st.text_input(
-        "Mobile Number:", max_chars=10, placeholder="Enter 10-digit number"
-    )
-
-    if st.button("Login to Shop", use_container_width=True):
-        if not u_name.strip() or not m_num.strip():
-            st.warning("Please enter both username and mobile number.")
-        elif not m_num.isdigit() or len(m_num) != 10:
-            st.warning(
-                "Please enter a valid 10-digit mobile number containing only numbers."
-            )
-        else:
-            st.session_state.logged_in = True
-            st.session_state.username = u_name.strip()
-            st.session_state.mobile = m_num.strip()
-
-            try:
-                payload = {
-                    "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "username": u_name.strip(),
-                    "mobile": m_num.strip(),
-                }
-                requests.get(GOOGLE_SCRIPT_WEB_APP_URL, params=payload, timeout=5)
-            except Exception:
-                pass
-
-            st.rerun()
-    st.stop()
 
 
 @st.cache_data(ttl=2)
@@ -302,7 +263,7 @@ if st.session_state.current_view == "Cart":
         with st.form("checkout_form"):
             delivery_address = st.text_area("Delivery Address:")
             alt_contact = st.text_input(
-                "Alternative Contact Number:", value=st.session_state.mobile
+                "Alternative Contact Number:", value=""
             )
             custom_desc = st.text_area("Product Specifications / Custom Description:")
 
@@ -316,7 +277,7 @@ if st.session_state.current_view == "Cart":
                         for i in st.session_state.cart
                     ])
 
-                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*User:* {st.session_state.username}\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
+                    wa_message = f"*New Order - HMB Nuts & Seeds*\n\n*Items:* {cart_summary}\n*Address:* {delivery_address}\n*Contact:* {alt_contact}\n*Note:* {custom_desc}"
                     encoded_message = urllib.parse.quote(wa_message)
                     wa_link = f"https://api.whatsapp.com/send?phone=91{OWNER_PHONE_NUMBER}&text={encoded_message}"
 
@@ -560,6 +521,7 @@ else:
                                             "product": prod["name"],
                                             "quantity": "1 Unit",
                                         })
+                                    st.rer0n = True
                                     st.rerun()
     else:
         st.info("No items found.")
