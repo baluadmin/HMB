@@ -77,7 +77,7 @@ st.markdown(
             border-radius: 6px;
         }
 
-        /* Fixed Bottom Bar Container */
+        /* Fixed Bottom-Left Aligned Bar Container */
         .fixed-bottom-bar {
             position: fixed !important;
             bottom: 0px !important;
@@ -93,7 +93,8 @@ st.markdown(
             box-shadow: 0 -4px 15px rgba(0,0,0,0.06) !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
+            gap: 16px !important;
             box-sizing: border-box !important;
         }
     </style>
@@ -270,7 +271,7 @@ st.markdown(
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- FIXED BOTTOM STICKY BAR FOR CART ---
+# --- FIXED BOTTOM STICKY BAR FOR CART (Left-aligned) ---
 if not isinstance(st.session_state.cart, list):
     st.session_state.cart = []
 
@@ -284,13 +285,13 @@ if cart_count > 0 and st.session_state.current_view == "Shop":
     st.markdown(
         f"""
         <div class="fixed-bottom-bar">
-            <div>
-                <div style="font-size: 11px; font-weight: 800; color: #64748b;">{total_qty} Item(s) in Cart</div>
-                <div style="font-size: 13px; font-weight: 900; color: #0f172a;">Ready to Checkout</div>
-            </div>
-            <a href="?view=Cart" target="_self" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 900; font-size: 12px; text-decoration: none; display: inline-block; text-align: center;">
+            <a href="?view=Cart" target="_self" style="background: #2563eb; color: white; padding: 10px 18px; border-radius: 8px; font-weight: 900; font-size: 12px; text-decoration: none; display: inline-block; text-align: center;">
                 View Cart 🛒
             </a>
+            <div>
+                <div style="font-size: 11px; font-weight: 800; color: #64748b; text-align: left;">{total_qty} Item(s) in Cart</div>
+                <div style="font-size: 12px; font-weight: 900; color: #0f172a; text-align: left;">Ready to Checkout</div>
+            </div>
         </div>
         """,
         unsafe_allow_html=True,
