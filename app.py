@@ -37,22 +37,27 @@ st.markdown("""
         }
         div.stButton > button:hover { background: #f0f9ff !important; }
 
-        /* Pinned sticky header configuration */
+        /* Permanently locked fixed header container */
         .sticky-header {
-            position: sticky !important;
+            position: fixed !important;
             top: 0px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 100% !important;
+            max-width: 480px !important;
             z-index: 999999 !important;
             background-color: #f8fafc !important;
-            padding: 8px 4px 4px 4px !important;
-            margin: 0px !important;
+            padding: 10px 10px 6px 10px !important;
+            box-sizing: border-box !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
-        /* Clean independent scrollable catalog wrapper */
+        /* Isolated scrollable product catalog wrapper with precise top clearance */
         .scrollable-catalog {
-            max-height: 72vh !important;
+            margin-top: 140px !important;
+            max-height: calc(100vh - 150px) !important;
             overflow-y: auto !important;
             padding-right: 2px;
-            margin-top: 4px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -156,7 +161,7 @@ if st.session_state.current_view == "Cart":
             st.rerun()
 
 else:
-    # Sticky Header Container wrapping Shop Name, Cart Button, and Search Bar
+    # Completely Fixed Top Header Container wrapping Shop Name, Cart Button, and Search Bar
     st.markdown('<div class="sticky-header">', unsafe_allow_html=True)
     
     top_col1, top_col2 = st.columns([3, 1], gap="small")
@@ -223,7 +228,6 @@ else:
         matching_suggestions = get_matching_products(active_query, product_records)
 
     if matching_suggestions and active_query != matching_suggestions[0]['name'].lower():
-        # Independent scrollable box for search suggestions dropdown to prevent overflowing background screen layout
         st.markdown("""
             <div style="max-height: 200px; overflow-y: auto; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
         """, unsafe_allow_html=True)
@@ -248,7 +252,7 @@ else:
     else:
         filtered_products = get_matching_products(active_query, product_records)
 
-    # Scrollable container wrapper for products catalog
+    # Completely Independent Scrollable Product Catalog Viewport Wrapper
     st.markdown('<div class="scrollable-catalog">', unsafe_allow_html=True)
 
     if filtered_products:
